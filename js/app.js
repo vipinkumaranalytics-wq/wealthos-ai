@@ -30,6 +30,7 @@ import { renderFinancialStatements } from './pages/financial-statements.js';
 import { renderLearningCenter, renderHabitTracker, renderJournal } from './pages/learning.js';
 import { renderReports } from './pages/reports.js';
 import { renderSettings } from './pages/settings.js';
+import { renderCountry } from './pages/country.js';
 
 // ---- REGISTER ALL ROUTES ----
 function registerRoutes() {
@@ -71,6 +72,7 @@ function registerRoutes() {
   router.register('journal', () => renderJournal(c));
   router.register('reports', () => renderReports(c));
   router.register('settings', () => renderSettings(c));
+  router.register('country', () => renderCountry(c));
 
   // Fallback for unmatched hash
   router.register('404', () => {
@@ -477,7 +479,10 @@ async function initApp() {
     // Start router
     router.start();
 
-    document.getElementById('app').classList.remove('hidden');
+    // Show main app & hide loader
+    const appEl = document.getElementById('app');
+    if (appEl) appEl.classList.remove('hidden');
+    hideLoader();
 
     // Welcome toast
     const user = store.get('user');
@@ -492,8 +497,16 @@ async function initApp() {
 
   } catch (err) {
     console.error('[WealthOS] Init error:', err);
-    updateLoader('Error loading app. Retrying...', 100);
-    setTimeout(() => location.reload(), 2000);
+    // Show app anyway — don't reload loop
+    const appEl = document.getElementById('app');
+    if (appEl) appEl.classList.remove('hidden');
+    hideLoader();
+    const c = document.getElementById('page-container');
+    if (c) c.innerHTML = `<div style="padding:40px;text-align:center;color:#94a3b8">
+      <i class="fa fa-triangle-exclamation" style="font-size:3rem;color:#f59e0b;margin-bottom:16px;display:block"></i>
+      <h2 style="color:#f8fafc;margin-bottom:8px">Something went wrong</h2>
+      <p>Click <a href="#dashboard" style="color:#6366f1">here</a> to try again.</p>
+    </div>`;
   }
 }
 
