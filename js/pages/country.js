@@ -638,7 +638,26 @@ let currentCountry = 'US';
 let exchangeRates = {};
 
 export function renderCountry(container) {
-  currentCountry = store.get('selectedCountry') || 'US';
+  // Pick up country from: global selector event, localStorage, store, or default
+  const lsCountry = localStorage.getItem('wos_country');
+  currentCountry = lsCountry || store.get('selectedCountry') || 'US';
+
+  // Listen for global country selector changes
+  const onCountrySelected = (e) => {
+    currentCountry = e.detail.code;
+    store.update('selectedCountry', () => currentCountry);
+    // Highlight grid button
+    container.querySelectorAll('.ctry-btn').forEach(b => {
+      const cc = COUNTRIES[b.dataset.code];
+      if (!cc) return;
+      b.style.border = `1.5px solid ${b.dataset.code === currentCountry ? cc.color : 'var(--border-color)'}`;
+      b.style.background = b.dataset.code === currentCountry ? cc.color + '20' : 'var(--bg-card)';
+    });
+    loadCountryData();
+  };
+  window.addEventListener('countrySelected', onCountrySelected);
+  // Cleanup when page changes
+  container._countryCleanup = () => window.removeEventListener('countrySelected', onCountrySelected);
 
   container.innerHTML = `
     <div class="page-header">
