@@ -234,6 +234,19 @@
           <div class="ticker-item"><span class="ticker-sym">ETH</span><span class="ticker-price" id="tick-eth">--</span></div>
           <div class="ticker-item"><span class="ticker-sym">GOLD</span><span class="ticker-price" id="tick-gold">--</span></div>
         </div>
+        <!-- Global Country Selector -->
+        <div class="country-sel-wrap" id="country-sel-wrap">
+          <button class="country-sel-btn" id="country-sel-btn" title="Select Country">
+            <span id="csel-flag">🌍</span>
+            <span id="csel-name">Country</span>
+            <i class="fa fa-chevron-down" id="csel-arrow" style="font-size:0.7rem"></i>
+          </button>
+          <div class="country-sel-drop hidden" id="country-sel-drop">
+            <div class="csd-header">Select Country</div>
+            <div class="csd-list" id="csd-list"></div>
+          </div>
+        </div>
+
         <button class="icon-btn" id="theme-toggle" title="Toggle Theme" aria-label="Toggle Theme">
           <i class="fa fa-moon" id="theme-icon"></i>
         </button>
@@ -300,6 +313,131 @@
 
 <!-- Search Results Dropdown -->
 <div id="search-dropdown" class="search-dropdown hidden"></div>
+
+<!-- Country Selector Styles -->
+<style>
+.country-sel-wrap { position:relative; }
+.country-sel-btn {
+  display:flex;align-items:center;gap:6px;
+  background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);
+  border-radius:10px;padding:7px 12px;cursor:pointer;color:var(--text-primary);
+  font-size:0.82rem;font-weight:600;transition:all 0.2s;white-space:nowrap;
+}
+.country-sel-btn:hover { background:rgba(99,102,241,0.25);border-color:#6366f1; }
+.country-sel-drop {
+  position:absolute;top:calc(100% + 8px);right:0;width:280px;
+  background:#1a1a2e;border:1px solid rgba(255,255,255,0.12);
+  border-radius:14px;z-index:9999;box-shadow:0 20px 60px rgba(0,0,0,0.6);
+  overflow:hidden;
+}
+.country-sel-drop.hidden { display:none; }
+.csd-header {
+  padding:12px 16px;font-size:0.75rem;font-weight:700;
+  color:#6366f1;text-transform:uppercase;letter-spacing:0.07em;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+.csd-list { max-height:380px;overflow-y:auto; }
+.csd-item {
+  display:flex;align-items:center;gap:10px;padding:10px 16px;
+  cursor:pointer;transition:background 0.15s;border-bottom:1px solid rgba(255,255,255,0.04);
+}
+.csd-item:hover { background:rgba(99,102,241,0.15); }
+.csd-item.active { background:rgba(99,102,241,0.25); }
+.csd-item .csd-flag { font-size:1.6rem;line-height:1; }
+.csd-item .csd-info { flex:1; }
+.csd-item .csd-cname { font-size:0.85rem;font-weight:600;color:#f8fafc; }
+.csd-item .csd-curr { font-size:0.72rem;color:#94a3b8; }
+.csd-item .csd-idx { font-size:0.75rem;color:#94a3b8;text-align:right; }
+</style>
+
+<!-- Country Selector Script -->
+<script>
+const CSEL_COUNTRIES = [
+  { code:'US',  flag:'🇺🇸', name:'United States', currency:'USD', index:'S&P 500' },
+  { code:'IN',  flag:'🇮🇳', name:'India',          currency:'INR', index:'SENSEX' },
+  { code:'GB',  flag:'🇬🇧', name:'United Kingdom', currency:'GBP', index:'FTSE 100' },
+  { code:'JP',  flag:'🇯🇵', name:'Japan',           currency:'JPY', index:'Nikkei 225' },
+  { code:'DE',  flag:'🇩🇪', name:'Germany',         currency:'EUR', index:'DAX 40' },
+  { code:'CN',  flag:'🇨🇳', name:'China',           currency:'CNY', index:'Shanghai' },
+  { code:'AU',  flag:'🇦🇺', name:'Australia',       currency:'AUD', index:'ASX 200' },
+  { code:'CA',  flag:'🇨🇦', name:'Canada',          currency:'CAD', index:'TSX' },
+  { code:'KR',  flag:'🇰🇷', name:'South Korea',     currency:'KRW', index:'KOSPI' },
+  { code:'AE',  flag:'🇦🇪', name:'UAE',             currency:'AED', index:'DFM' },
+  { code:'SA',  flag:'🇸🇦', name:'Saudi Arabia',    currency:'SAR', index:'Tadawul' },
+  { code:'SG',  flag:'🇸🇬', name:'Singapore',       currency:'SGD', index:'STI' },
+];
+
+let cselSelected = localStorage.getItem('wos_country') || null;
+
+function initCountrySelector() {
+  const btn   = document.getElementById('country-sel-btn');
+  const drop  = document.getElementById('country-sel-drop');
+  const list  = document.getElementById('csd-list');
+  const flag  = document.getElementById('csel-flag');
+  const name  = document.getElementById('csel-name');
+
+  if (!btn || !drop || !list) return;
+
+  // Build list
+  list.innerHTML = CSEL_COUNTRIES.map(c => `
+    <div class="csd-item ${cselSelected === c.code ? 'active' : ''}" data-code="${c.code}">
+      <span class="csd-flag">${c.flag}</span>
+      <div class="csd-info">
+        <div class="csd-cname">${c.name}</div>
+        <div class="csd-curr">${c.currency}</div>
+      </div>
+      <div class="csd-idx">${c.index}</div>
+    </div>
+  `).join('');
+
+  // Restore saved
+  if (cselSelected) {
+    const saved = CSEL_COUNTRIES.find(c => c.code === cselSelected);
+    if (saved) { flag.textContent = saved.flag; name.textContent = saved.name; }
+  }
+
+  // Toggle dropdown
+  btn.addEventListener('click', e => {
+    e.stopPropagation();
+    drop.classList.toggle('hidden');
+  });
+
+  // Close on outside click
+  document.addEventListener('click', () => drop.classList.add('hidden'));
+
+  // Select country
+  list.addEventListener('click', e => {
+    const item = e.target.closest('.csd-item');
+    if (!item) return;
+    const code = item.dataset.code;
+    const c = CSEL_COUNTRIES.find(x => x.code === code);
+    if (!c) return;
+
+    // Update UI
+    flag.textContent = c.flag;
+    name.textContent = c.name;
+    drop.classList.add('hidden');
+    list.querySelectorAll('.csd-item').forEach(el => el.classList.remove('active'));
+    item.classList.add('active');
+
+    // Save to localStorage
+    localStorage.setItem('wos_country', code);
+    cselSelected = code;
+
+    // Navigate to Country Intelligence page with this country
+    window.location.hash = '#country';
+    // Signal country.js to load this country
+    window.dispatchEvent(new CustomEvent('countrySelected', { detail: { code } }));
+  });
+}
+
+// Wait for DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCountrySelector);
+} else {
+  setTimeout(initCountrySelector, 500);
+}
+</script>
 
 <!-- JS Modules -->
 <script type="module" src="js/app.js"></script>
