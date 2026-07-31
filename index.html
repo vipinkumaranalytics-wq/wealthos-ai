@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="WealthOS AI — Your intelligent financial command center. Real-time markets, portfolio tracking, AI insights, and personal wealth management." />
+  <meta name="keywords" content="stock market, crypto, forex, portfolio tracker, wealth management, AI finance, investment tracker" />
+  <meta name="author" content="WealthOS AI" />
+  <meta name="theme-color" content="#0f0f1a" />
+  <meta property="og:title" content="WealthOS AI" />
+  <meta property="og:description" content="Your intelligent financial command center" />
+  <meta property="og:type" content="website" />
+  <title>WealthOS AI — Intelligent Financial Command Center</title>
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="assets/icons/logo.svg" />
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <!-- Chart Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.44.0/dist/apexcharts.min.js"></script>
+
+  <!-- Main CSS -->
+  <link rel="stylesheet" href="css/main.css" />
+</head>
+<body>
+
+<!-- App Loader -->
+<div id="app-loader" class="app-loader">
+  <div class="loader-content">
+    <div class="loader-logo">
+      <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+        <rect width="48" height="48" rx="12" fill="url(#grad1)"/>
+        <path d="M12 32 L20 20 L28 26 L36 14" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="36" cy="14" r="3" fill="#22c55e"/>
+        <defs>
+          <linearGradient id="grad1" x1="0" y1="0" x2="48" y2="48">
+            <stop offset="0%" stop-color="#6366f1"/>
+            <stop offset="100%" stop-color="#8b5cf6"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div class="loader-text">WealthOS AI</div>
+    <div class="loader-bar"><div class="loader-bar-fill"></div></div>
+    <div class="loader-status">Initializing...</div>
+  </div>
+</div>
+
+<!-- Main App -->
+<div id="app" class="app hidden">
+
+  <!-- Sidebar -->
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <svg width="32" height="32" viewBox="0 0 48 48" fill="none">
+          <rect width="48" height="48" rx="10" fill="url(#sgrad)"/>
+          <path d="M12 32 L20 20 L28 26 L36 14" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="36" cy="14" r="3" fill="#22c55e"/>
+          <defs>
+            <linearGradient id="sgrad" x1="0" y1="0" x2="48" y2="48">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#8b5cf6"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <span class="sidebar-brand">WealthOS <span class="brand-ai">AI</span></span>
+      </div>
+      <button class="sidebar-toggle" id="sidebar-toggle" aria-label="Toggle Sidebar">
+        <i class="fa fa-bars"></i>
+      </button>
+    </div>
+
+    <div class="sidebar-search">
+      <i class="fa fa-search"></i>
+      <input type="text" id="sidebar-search-input" placeholder="Search modules..." autocomplete="off" />
+    </div>
+
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <div class="nav-group">
+        <div class="nav-group-label">Overview</div>
+        <a href="#dashboard" class="nav-item active" data-page="dashboard">
+          <i class="fa fa-chart-pie"></i><span>Dashboard</span>
+        </a>
+        <a href="#global-markets" class="nav-item" data-page="global-markets">
+          <i class="fa fa-globe"></i><span>Global Markets</span>
+        </a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Markets</div>
+        <a href="#stocks" class="nav-item" data-page="stocks">
+          <i class="fa fa-chart-line"></i><span>Stocks</span>
+        </a>
+        <a href="#etfs" class="nav-item" data-page="etfs">
+          <i class="fa fa-layer-group"></i><span>ETFs</span>
+        </a>
+        <a href="#crypto" class="nav-item" data-page="crypto">
+          <i class="fab fa-bitcoin"></i><span>Crypto</span>
+        </a>
+        <a href="#forex" class="nav-item" data-page="forex">
+          <i class="fa fa-exchange-alt"></i><span>Forex</span>
+        </a>
+        <a href="#commodities" class="nav-item" data-page="commodities">
+          <i class="fa fa-oil-can"></i><span>Commodities</span>
+        </a>
+        <a href="#mutual-funds" class="nav-item" data-page="mutual-funds">
+          <i class="fa fa-building-columns"></i><span>Mutual Funds</span>
+        </a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Analytics</div>
+        <a href="#heatmap" class="nav-item" data-page="heatmap">
+          <i class="fa fa-th"></i><span>Heatmap</span>
+        </a>
+        <a href="#sector-performance" class="nav-item" data-page="sector-performance">
+          <i class="fa fa-chart-bar"></i><span>Sector Performance</span>
+        </a>
+        <a href="#top-gainers" class="nav-item" data-page="top-gainers">
+          <i class="fa fa-arrow-trend-up"></i><span>Top Gainers</span>
+        </a>
+        <a href="#top-losers" class="nav-item" data-page="top-losers">
+          <i class="fa fa-arrow-trend-down"></i><span>Top Losers</span>
+        </a>
+        <a href="#ipo-tracker" class="nav-item" data-page="ipo-tracker">
+          <i class="fa fa-rocket"></i><span>IPO Tracker</span>
+        </a>
+        <a href="#economic-calendar" class="nav-item" data-page="economic-calendar">
+          <i class="fa fa-calendar-days"></i><span>Economic Calendar</span>
+        </a>
+        <a href="#fear-greed" class="nav-item" data-page="fear-greed">
+          <i class="fa fa-gauge-high"></i><span>Fear &amp; Greed</span>
+        </a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Portfolio</div>
+        <a href="#watchlist" class="nav-item" data-page="watchlist">
+          <i class="fa fa-star"></i><span>Watchlist</span>
+        </a>
+        <a href="#portfolio" class="nav-item" data-page="portfolio">
+          <i class="fa fa-briefcase"></i><span>Portfolio</span>
+        </a>
+        <a href="#dividend-tracker" class="nav-item" data-page="dividend-tracker">
+          <i class="fa fa-coins"></i><span>Dividend Tracker</span>
+        </a>
+        <a href="#financial-statements" class="nav-item" data-page="financial-statements">
+          <i class="fa fa-file-invoice-dollar"></i><span>Financials</span>
+        </a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Intelligence</div>
+        <a href="#news" class="nav-item" data-page="news">
+          <i class="fa fa-newspaper"></i><span>Market News</span>
+        </a>
+        <a href="#market-sentiment" class="nav-item" data-page="market-sentiment">
+          <i class="fa fa-brain"></i><span>Market Sentiment</span>
+        </a>
+        <a href="#business-intelligence" class="nav-item" data-page="business-intelligence">
+          <i class="fa fa-lightbulb"></i><span>Business Intel</span>
+        </a>
+        <a href="#ai-chat" class="nav-item" data-page="ai-chat">
+          <i class="fa fa-robot"></i><span>AI Advisor</span>
+          <span class="nav-badge">AI</span>
+        </a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Personal Wealth</div>
+        <a href="#personal-dashboard" class="nav-item" data-page="personal-dashboard">
+          <i class="fa fa-wallet"></i><span>Wealth Dashboard</span>
+        </a>
+        <a href="#income-tracker" class="nav-item" data-page="income-tracker">
+          <i class="fa fa-money-bill-wave"></i><span>Income Tracker</span>
+        </a>
+        <a href="#expense-tracker" class="nav-item" data-page="expense-tracker">
+          <i class="fa fa-receipt"></i><span>Expense Tracker</span>
+        </a>
+        <a href="#budget-planner" class="nav-item" data-page="budget-planner">
+          <i class="fa fa-scale-balanced"></i><span>Budget Planner</span>
+        </a>
+        <a href="#net-worth" class="nav-item" data-page="net-worth">
+          <i class="fa fa-chart-area"></i><span>Net Worth</span>
+        </a>
+        <a href="#goal-planner" class="nav-item" data-page="goal-planner">
+          <i class="fa fa-bullseye"></i><span>Goal Planner</span>
+        </a>
+        <a href="#debt-tracker" class="nav-item" data-page="debt-tracker">
+          <i class="fa fa-credit-card"></i><span>Debt Tracker</span>
+        </a>
+        <a href="#retirement-planner" class="nav-item" data-page="retirement-planner">
+          <i class="fa fa-umbrella-beach"></i><span>Retirement</span>
+        </a>
+        <a href="#tax-planner" class="nav-item" data-page="tax-planner">
+          <i class="fa fa-file-contract"></i><span>Tax Planner</span>
+        </a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Growth</div>
+        <a href="#learning-center" class="nav-item" data-page="learning-center">
+          <i class="fa fa-graduation-cap"></i><span>Learning Center</span>
+        </a>
+        <a href="#habit-tracker" class="nav-item" data-page="habit-tracker">
+          <i class="fa fa-check-circle"></i><span>Habit Tracker</span>
+        </a>
+        <a href="#journal" class="nav-item" data-page="journal">
+          <i class="fa fa-book-open"></i><span>Journal</span>
+        </a>
+        <a href="#reports" class="nav-item" data-page="reports">
+          <i class="fa fa-file-chart-column"></i><span>Reports</span>
+        </a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-label">Account</div>
+        <a href="#settings" class="nav-item" data-page="settings">
+          <i class="fa fa-gear"></i><span>Settings</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="market-status" id="market-status-indicator">
+        <span class="status-dot"></span>
+        <span class="status-text">Markets Open</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-wrapper">
+    <!-- Top Navigation -->
+    <header class="topnav" id="topnav">
+      <div class="topnav-left">
+        <button class="menu-btn" id="menu-btn" aria-label="Menu">
+          <i class="fa fa-bars"></i>
+        </button>
+        <div class="breadcrumb" id="breadcrumb">
+          <span>Dashboard</span>
+        </div>
+      </div>
+      <div class="topnav-center">
+        <div class="global-search">
+          <i class="fa fa-search"></i>
+          <input type="text" id="global-search" placeholder="Search stocks, crypto, news... (Ctrl+K)" autocomplete="off" />
+          <kbd>⌘K</kbd>
+        </div>
+      </div>
+      <div class="topnav-right">
+        <div class="market-ticker" id="market-ticker">
+          <div class="ticker-item"><span class="ticker-sym">BTC</span><span class="ticker-price" id="tick-btc">--</span></div>
+          <div class="ticker-item"><span class="ticker-sym">ETH</span><span class="ticker-price" id="tick-eth">--</span></div>
+          <div class="ticker-item"><span class="ticker-sym">GOLD</span><span class="ticker-price" id="tick-gold">--</span></div>
+        </div>
+        <button class="icon-btn" id="theme-toggle" title="Toggle Theme" aria-label="Toggle Theme">
+          <i class="fa fa-moon" id="theme-icon"></i>
+        </button>
+        <button class="icon-btn" id="notif-btn" title="Notifications" aria-label="Notifications">
+          <i class="fa fa-bell"></i>
+          <span class="notif-badge" id="notif-badge">3</span>
+        </button>
+        <button class="icon-btn" id="voice-btn" title="Voice Search" aria-label="Voice Search">
+          <i class="fa fa-microphone"></i>
+        </button>
+        <div class="user-avatar" id="user-avatar" title="Profile">
+          <span>R</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Container -->
+    <main class="page-container" id="page-container">
+      <!-- Pages are injected here by router -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <span>WealthOS AI &copy; 2025 — Built with ❤️ for financial freedom</span>
+      <span class="footer-links">
+        <a href="#" id="privacy-link">Privacy</a>
+        <a href="#" id="terms-link">Terms</a>
+        <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+      </span>
+    </footer>
+  </div>
+
+</div>
+
+<!-- Command Palette -->
+<div id="command-palette" class="command-palette hidden" role="dialog" aria-label="Command Palette">
+  <div class="cp-overlay" id="cp-overlay"></div>
+  <div class="cp-modal">
+    <div class="cp-search">
+      <i class="fa fa-search"></i>
+      <input type="text" id="cp-input" placeholder="Search commands, stocks, pages..." autocomplete="off" />
+      <kbd>ESC</kbd>
+    </div>
+    <div class="cp-results" id="cp-results"></div>
+    <div class="cp-footer">
+      <span><kbd>↑↓</kbd> Navigate</span>
+      <span><kbd>Enter</kbd> Select</span>
+      <span><kbd>Esc</kbd> Close</span>
+    </div>
+  </div>
+</div>
+
+<!-- Notification Panel -->
+<div id="notif-panel" class="notif-panel hidden">
+  <div class="notif-header">
+    <h3>Notifications</h3>
+    <button id="clear-notifs" class="btn-text">Clear all</button>
+  </div>
+  <div id="notif-list" class="notif-list"></div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+<!-- Search Results Dropdown -->
+<div id="search-dropdown" class="search-dropdown hidden"></div>
+
+<!-- JS Modules -->
+<script type="module" src="js/app.js"></script>
+
+</body>
+</html>
