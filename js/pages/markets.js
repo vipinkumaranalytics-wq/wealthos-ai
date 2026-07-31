@@ -229,9 +229,110 @@ function renderSectorsTab(el) {
   }, 100);
 }
 
+// ---- Country Stocks Data ----
+const COUNTRY_STOCKS = {
+  IN: [
+    { symbol:'RELIANCE', name:'Reliance Industries', price:2945, change:+35.4, changePct:+1.22, volume:'12.3M', mktCap:'₹19.9L Cr', sector:'Conglomerate' },
+    { symbol:'TCS',      name:'Tata Consultancy Services', price:3821, change:+30.6, changePct:+0.81, volume:'4.1M', mktCap:'₹13.8L Cr', sector:'IT Services' },
+    { symbol:'HDFCBANK', name:'HDFC Bank', price:1672, change:-5.1, changePct:-0.30, volume:'8.7M', mktCap:'₹12.4L Cr', sector:'Banking' },
+    { symbol:'INFY',     name:'Infosys', price:1589, change:+8.0, changePct:+0.51, volume:'6.2M', mktCap:'₹6.6L Cr', sector:'IT Services' },
+    { symbol:'ICICIBANK',name:'ICICI Bank', price:1198, change:+13.2, changePct:+1.11, volume:'9.5M', mktCap:'₹8.4L Cr', sector:'Banking' },
+    { symbol:'WIPRO',    name:'Wipro Ltd', price:478, change:+3.8, changePct:+0.80, volume:'5.1M', mktCap:'₹2.5L Cr', sector:'IT Services' },
+    { symbol:'BAJFINANCE',name:'Bajaj Finance', price:7124, change:-42.3, changePct:-0.59, volume:'1.2M', mktCap:'₹4.3L Cr', sector:'Finance' },
+    { symbol:'LT',       name:'Larsen & Toubro', price:3568, change:+28.5, changePct:+0.80, volume:'2.1M', mktCap:'₹4.9L Cr', sector:'Industrials' },
+    { symbol:'ASIANPAINT',name:'Asian Paints', price:2890, change:-18.4, changePct:-0.63, volume:'1.8M', mktCap:'₹2.8L Cr', sector:'Consumer' },
+    { symbol:'MARUTI',   name:'Maruti Suzuki', price:12450, change:+148.2, changePct:+1.20, volume:'0.8M', mktCap:'₹3.8L Cr', sector:'Automotive' },
+  ],
+  GB: [
+    { symbol:'SHEL', name:'Shell PLC', price:28.40, change:-0.14, changePct:-0.49, volume:'18.2M', mktCap:'$218B', sector:'Energy' },
+    { symbol:'AZN',  name:'AstraZeneca', price:127.60, change:+1.79, changePct:+1.42, volume:'4.1M', mktCap:'$249B', sector:'Pharma' },
+    { symbol:'HSBA', name:'HSBC Holdings', price:7.12, change:+0.02, changePct:+0.28, volume:'32.5M', mktCap:'$153B', sector:'Banking' },
+    { symbol:'BP',   name:'BP PLC', price:4.52, change:-0.04, changePct:-0.88, volume:'22.8M', mktCap:'$86B', sector:'Energy' },
+    { symbol:'ULVR', name:'Unilever', price:44.30, change:+0.27, changePct:+0.61, volume:'5.4M', mktCap:'$116B', sector:'Consumer' },
+    { symbol:'GSK',  name:'GSK PLC', price:17.82, change:+0.31, changePct:+1.77, volume:'8.9M', mktCap:'$74B', sector:'Pharma' },
+    { symbol:'RIO',  name:'Rio Tinto', price:51.20, change:-0.40, changePct:-0.78, volume:'6.1M', mktCap:'$83B', sector:'Mining' },
+    { symbol:'DGE',  name:'Diageo', price:24.60, change:+0.18, changePct:+0.73, volume:'4.2M', mktCap:'$61B', sector:'Beverages' },
+  ],
+  JP: [
+    { symbol:'TM',   name:'Toyota Motor', price:2453, change:+17.2, changePct:+0.71, volume:'8.2M', mktCap:'$264B', sector:'Automotive' },
+    { symbol:'6758', name:'Sony Group', price:12890, change:+193.4, changePct:+1.52, volume:'3.1M', mktCap:'$117B', sector:'Technology' },
+    { symbol:'9984', name:'SoftBank Group', price:9234, change:-110.8, changePct:-1.19, volume:'5.8M', mktCap:'$81B', sector:'Investment' },
+    { symbol:'6501', name:'Hitachi', price:13450, change:+121.1, changePct:+0.91, volume:'2.2M', mktCap:'$84B', sector:'Industrials' },
+    { symbol:'8306', name:'MUFG', price:1456, change:+5.8, changePct:+0.40, volume:'14.6M', mktCap:'$134B', sector:'Banking' },
+    { symbol:'6902', name:'Denso Corp', price:2340, change:+18.7, changePct:+0.81, volume:'3.4M', mktCap:'$48B', sector:'Auto Parts' },
+    { symbol:'4063', name:'Shin-Etsu Chemical', price:5870, change:-46.9, changePct:-0.79, volume:'1.8M', mktCap:'$59B', sector:'Chemicals' },
+  ],
+  DE: [
+    { symbol:'SAP',  name:'SAP SE', price:189.50, change:+2.08, changePct:+1.11, volume:'2.1M', mktCap:'$232B', sector:'Software' },
+    { symbol:'SIE',  name:'Siemens AG', price:175.80, change:+1.06, changePct:+0.61, volume:'1.8M', mktCap:'$152B', sector:'Industrials' },
+    { symbol:'ALV',  name:'Allianz SE', price:276.40, change:-0.55, changePct:-0.20, volume:'0.9M', mktCap:'$115B', sector:'Insurance' },
+    { symbol:'BMW',  name:'BMW AG', price:89.60, change:+0.36, changePct:+0.40, volume:'2.4M', mktCap:'$57B', sector:'Automotive' },
+    { symbol:'DBK',  name:'Deutsche Bank', price:15.20, change:-0.11, changePct:-0.72, volume:'8.9M', mktCap:'$32B', sector:'Banking' },
+    { symbol:'BAS',  name:'BASF SE', price:46.80, change:+0.56, changePct:+1.21, volume:'3.2M', mktCap:'$43B', sector:'Chemicals' },
+    { symbol:'VOW3', name:'Volkswagen', price:112.40, change:-1.12, changePct:-0.99, volume:'1.6M', mktCap:'$56B', sector:'Automotive' },
+  ],
+  CN: [
+    { symbol:'601398', name:'ICBC', price:5.82, change:+0.02, changePct:+0.35, volume:'58.4M', mktCap:'$257B', sector:'Banking' },
+    { symbol:'600519', name:'Kweichow Moutai', price:1498, change:+17.9, changePct:+1.21, volume:'1.2M', mktCap:'$192B', sector:'Beverages' },
+    { symbol:'0700',   name:'Tencent Holdings', price:380, change:+6.8, changePct:+1.82, volume:'12.4M', mktCap:'$369B', sector:'Technology' },
+    { symbol:'9988',   name:'Alibaba Group', price:82, change:-0.9, changePct:-1.09, volume:'22.8M', mktCap:'$202B', sector:'E-Commerce' },
+    { symbol:'601988', name:'Bank of China', price:4.57, change:+0.01, changePct:+0.22, volume:'44.2M', mktCap:'$154B', sector:'Banking' },
+    { symbol:'3690',   name:'Meituan', price:168, change:+3.4, changePct:+2.07, volume:'8.6M', mktCap:'$98B', sector:'Tech/Delivery' },
+  ],
+  AU: [
+    { symbol:'BHP',  name:'BHP Group', price:43.20, change:+0.35, changePct:+0.82, volume:'8.4M', mktCap:'$210B', sector:'Mining' },
+    { symbol:'CBA',  name:'Commonwealth Bank', price:127.50, change:+0.51, changePct:+0.40, volume:'2.1M', mktCap:'$211B', sector:'Banking' },
+    { symbol:'RIO',  name:'Rio Tinto', price:118.60, change:-0.36, changePct:-0.30, volume:'3.2M', mktCap:'$104B', sector:'Mining' },
+    { symbol:'ANZ',  name:'ANZ Banking Group', price:29.80, change:+0.18, changePct:+0.61, volume:'6.8M', mktCap:'$83B', sector:'Banking' },
+    { symbol:'WES',  name:'Wesfarmers', price:72.40, change:+0.80, changePct:+1.12, volume:'2.4M', mktCap:'$82B', sector:'Retail' },
+    { symbol:'CSL',  name:'CSL Limited', price:298.60, change:+2.39, changePct:+0.81, volume:'1.1M', mktCap:'$136B', sector:'Biotech' },
+  ],
+  CA: [
+    { symbol:'RY',   name:'Royal Bank of Canada', price:134.50, change:+0.67, changePct:+0.50, volume:'4.2M', mktCap:'$187B', sector:'Banking' },
+    { symbol:'TD',   name:'Toronto-Dominion Bank', price:78.20, change:-0.16, changePct:-0.20, volume:'6.1M', mktCap:'$141B', sector:'Banking' },
+    { symbol:'CNQ',  name:'Canadian Natural Resources', price:44.60, change:+0.58, changePct:+1.32, volume:'5.4M', mktCap:'$93B', sector:'Energy' },
+    { symbol:'BNS',  name:'Bank of Nova Scotia', price:62.30, change:+0.25, changePct:+0.40, volume:'5.8M', mktCap:'$74B', sector:'Banking' },
+    { symbol:'SU',   name:'Suncor Energy', price:52.10, change:-0.31, changePct:-0.59, volume:'8.2M', mktCap:'$57B', sector:'Energy' },
+  ],
+  KR: [
+    { symbol:'005930', name:'Samsung Electronics', price:75400, change:+904.8, changePct:+1.22, volume:'12.4M', mktCap:'$373B', sector:'Technology' },
+    { symbol:'000660', name:'SK Hynix', price:194500, change:+4086.5, changePct:+2.15, volume:'4.1M', mktCap:'$141B', sector:'Semiconductors' },
+    { symbol:'005380', name:'Hyundai Motor', price:248000, change:+1240.0, changePct:+0.50, volume:'1.8M', mktCap:'$52B', sector:'Automotive' },
+    { symbol:'035420', name:'NAVER Corp', price:187000, change:+2805.0, changePct:+1.52, volume:'1.2M', mktCap:'$30B', sector:'Internet' },
+    { symbol:'051910', name:'LG Chem', price:423000, change:-3384.0, changePct:-0.79, volume:'0.8M', mktCap:'$29B', sector:'Chemicals' },
+  ],
+  AE: [
+    { symbol:'FAB',   name:'First Abu Dhabi Bank', price:14.30, change:+0.06, changePct:+0.42, volume:'8.2M', mktCap:'$50B', sector:'Banking' },
+    { symbol:'ADNOC', name:'ADNOC Distribution', price:4.28, change:+0.03, changePct:+0.71, volume:'12.4M', mktCap:'$17B', sector:'Energy' },
+    { symbol:'EMAAR', name:'Emaar Properties', price:9.12, change:-0.03, changePct:-0.33, volume:'18.6M', mktCap:'$16B', sector:'Real Estate' },
+    { symbol:'DIB',   name:'Dubai Islamic Bank', price:6.87, change:+0.03, changePct:+0.44, volume:'9.8M', mktCap:'$11B', sector:'Banking' },
+  ],
+  SA: [
+    { symbol:'2222', name:'Saudi Aramco', price:29.45, change:+0.09, changePct:+0.31, volume:'48.2M', mktCap:'$1.78T', sector:'Energy' },
+    { symbol:'1180', name:'Al Rajhi Bank', price:84.50, change:+0.51, changePct:+0.61, volume:'8.4M', mktCap:'$89B', sector:'Banking' },
+    { symbol:'2010', name:'SABIC', price:78.30, change:-0.16, changePct:-0.20, volume:'4.2M', mktCap:'$62B', sector:'Chemicals' },
+    { symbol:'7010', name:'Saudi Telecom (STC)', price:53.40, change:+0.21, changePct:+0.40, volume:'5.8M', mktCap:'$54B', sector:'Telecom' },
+  ],
+  SG: [
+    { symbol:'DBS',  name:'DBS Group', price:36.40, change:+0.22, changePct:+0.61, volume:'4.2M', mktCap:'$94B', sector:'Banking' },
+    { symbol:'OCBC', name:'OCBC Bank', price:14.20, change:+0.04, changePct:+0.28, volume:'6.8M', mktCap:'$54B', sector:'Banking' },
+    { symbol:'UOB',  name:'United Overseas Bank', price:31.80, change:-0.06, changePct:-0.19, volume:'3.4M', mktCap:'$41B', sector:'Banking' },
+    { symbol:'SGX',  name:'Singapore Exchange', price:9.67, change:+0.04, changePct:+0.41, volume:'2.1M', mktCap:'$8B', sector:'Finance' },
+  ],
+};
+
+const COUNTRY_INFO = {
+  US:'🇺🇸 United States', IN:'🇮🇳 India', GB:'🇬🇧 United Kingdom', JP:'🇯🇵 Japan',
+  DE:'🇩🇪 Germany', CN:'🇨🇳 China', AU:'🇦🇺 Australia', CA:'🇨🇦 Canada',
+  KR:'🇰🇷 South Korea', AE:'🇦🇪 UAE', SA:'🇸🇦 Saudi Arabia', SG:'🇸🇬 Singapore'
+};
+
 // ---- STOCKS ----
 export function renderStocks(container) {
-  const stocks = demoData.stocks;
+  const selectedCountry = localStorage.getItem('wos_country') || 'US';
+  const countryStocks = COUNTRY_STOCKS[selectedCountry];
+  const stocks = countryStocks || demoData.stocks;
+  const countryLabel = COUNTRY_INFO[selectedCountry] || '🌍 Global';
   let filtered = [...stocks];
   let sortKey = 'mktCap';
   let sortDir = 1;
@@ -239,7 +340,12 @@ export function renderStocks(container) {
 
   container.innerHTML = `
     <div class="page-header">
-      <div><h1 class="page-title">Stocks</h1><p class="page-subtitle">Equity markets, stock screener, and company data</p></div>
+      <div>
+        <h1 class="page-title">Stocks — ${countryLabel}</h1>
+        <p class="page-subtitle">Equity markets, stock screener, and company data
+          ${selectedCountry !== 'US' ? `<span style="margin-left:8px;padding:2px 10px;background:rgba(99,102,241,0.2);border:1px solid #6366f1;border-radius:20px;font-size:0.75rem;color:#a5b4fc">Showing ${countryLabel} stocks</span>` : ''}
+        </p>
+      </div>
       <div class="page-actions">
         <button class="btn btn-secondary btn-sm" id="stock-export"><i class="fa fa-download"></i> Export CSV</button>
       </div>
