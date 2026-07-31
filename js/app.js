@@ -477,8 +477,7 @@ async function initApp() {
     // Start router
     router.start();
 
-    // Hide loader
-    hideLoader();
+    document.getElementById('app').classList.remove('hidden');
 
     // Welcome toast
     const user = store.get('user');
