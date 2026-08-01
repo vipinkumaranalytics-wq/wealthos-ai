@@ -86,6 +86,21 @@
       <input type="text" id="sidebar-search-input" placeholder="Search modules..." autocomplete="off" />
     </div>
 
+    <!-- 🌍 Country Selector in Sidebar -->
+    <div style="padding:8px 12px 4px">
+      <div style="font-size:0.7rem;font-weight:700;color:#6366f1;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:6px">🌍 Country</div>
+      <div style="position:relative">
+        <button id="sb-country-btn" style="width:100%;display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.3);border-radius:10px;cursor:pointer;color:#f8fafc;font-size:0.83rem;font-weight:600;transition:all 0.2s">
+          <span id="sb-cflag" style="font-size:1.4rem">🌍</span>
+          <span id="sb-cname" style="flex:1;text-align:left">Select Country</span>
+          <i class="fa fa-chevron-down" style="font-size:0.65rem;color:#94a3b8"></i>
+        </button>
+        <div id="sb-country-drop" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:#12122a;border:1px solid rgba(255,255,255,0.12);border-radius:12px;z-index:9999;box-shadow:0 16px 48px rgba(0,0,0,0.7);max-height:320px;overflow-y:auto">
+          <div id="sb-country-list"></div>
+        </div>
+      </div>
+    </div>
+
     <nav class="sidebar-nav" id="sidebar-nav">
       <div class="nav-group">
         <div class="nav-group-label">Overview</div>
@@ -192,6 +207,10 @@
         <a href="#country" class="nav-item" data-page="country">
           <i class="fa fa-earth-americas"></i><span>Country Intelligence</span>
         </a>
+        <a href="#research" class="nav-item" data-page="research">
+          <i class="fa fa-magnifying-glass-chart"></i><span>Global Research</span>
+          <span class="nav-badge" style="background:#f59e0b;color:#000">NEW</span>
+        </a>
       </div>
       <div class="nav-group">
         <div class="nav-group-label">Account</div>
@@ -234,19 +253,6 @@
           <div class="ticker-item"><span class="ticker-sym">ETH</span><span class="ticker-price" id="tick-eth">--</span></div>
           <div class="ticker-item"><span class="ticker-sym">GOLD</span><span class="ticker-price" id="tick-gold">--</span></div>
         </div>
-        <!-- Global Country Selector -->
-        <div class="country-sel-wrap" id="country-sel-wrap">
-          <button class="country-sel-btn" id="country-sel-btn" title="Select Country">
-            <span id="csel-flag">🌍</span>
-            <span id="csel-name">Country</span>
-            <i class="fa fa-chevron-down" id="csel-arrow" style="font-size:0.7rem"></i>
-          </button>
-          <div class="country-sel-drop hidden" id="country-sel-drop">
-            <div class="csd-header">Select Country</div>
-            <div class="csd-list" id="csd-list"></div>
-          </div>
-        </div>
-
         <button class="icon-btn" id="theme-toggle" title="Toggle Theme" aria-label="Toggle Theme">
           <i class="fa fa-moon" id="theme-icon"></i>
         </button>
@@ -366,7 +372,7 @@ select option:hover, select option:checked {
 .csd-item .csd-idx { font-size:0.75rem;color:#94a3b8;text-align:right; }
 </style>
 
-<!-- Country Selector Script -->
+<!-- Country Selector Script (Sidebar) -->
 <script>
 const CSEL_COUNTRIES = [
   { code:'US',  flag:'🇺🇸', name:'United States', currency:'USD', index:'S&P 500' },
@@ -383,75 +389,77 @@ const CSEL_COUNTRIES = [
   { code:'SG',  flag:'🇸🇬', name:'Singapore',       currency:'SGD', index:'STI' },
 ];
 
-let cselSelected = localStorage.getItem('wos_country') || null;
-
-function initCountrySelector() {
-  const btn   = document.getElementById('country-sel-btn');
-  const drop  = document.getElementById('country-sel-drop');
-  const list  = document.getElementById('csd-list');
-  const flag  = document.getElementById('csel-flag');
-  const name  = document.getElementById('csel-name');
-
+function initSidebarCountrySelector() {
+  const btn  = document.getElementById('sb-country-btn');
+  const drop = document.getElementById('sb-country-drop');
+  const list = document.getElementById('sb-country-list');
+  const flag = document.getElementById('sb-cflag');
+  const name = document.getElementById('sb-cname');
   if (!btn || !drop || !list) return;
 
-  // Build list
-  list.innerHTML = CSEL_COUNTRIES.map(c => `
-    <div class="csd-item ${cselSelected === c.code ? 'active' : ''}" data-code="${c.code}">
-      <span class="csd-flag">${c.flag}</span>
-      <div class="csd-info">
-        <div class="csd-cname">${c.name}</div>
-        <div class="csd-curr">${c.currency}</div>
-      </div>
-      <div class="csd-idx">${c.index}</div>
-    </div>
-  `).join('');
+  let selected = localStorage.getItem('wos_country') || null;
 
-  // Restore saved
-  if (cselSelected) {
-    const saved = CSEL_COUNTRIES.find(c => c.code === cselSelected);
+  // Build country list
+  function buildList() {
+    list.innerHTML = CSEL_COUNTRIES.map(c => `
+      <div data-code="${c.code}" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;
+        border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.15s;
+        background:${selected===c.code?'rgba(99,102,241,0.2)':'transparent'}">
+        <span style="font-size:1.5rem">${c.flag}</span>
+        <div style="flex:1">
+          <div style="font-size:0.82rem;font-weight:600;color:#f8fafc">${c.name}</div>
+          <div style="font-size:0.7rem;color:#94a3b8">${c.currency} · ${c.index}</div>
+        </div>
+        ${selected===c.code?'<i class="fa fa-check" style="color:#6366f1;font-size:0.75rem"></i>':''}
+      </div>
+    `).join('');
+  }
+
+  // Restore saved selection
+  if (selected) {
+    const saved = CSEL_COUNTRIES.find(c => c.code === selected);
     if (saved) { flag.textContent = saved.flag; name.textContent = saved.name; }
   }
+
+  buildList();
 
   // Toggle dropdown
   btn.addEventListener('click', e => {
     e.stopPropagation();
-    drop.classList.toggle('hidden');
+    drop.style.display = drop.style.display === 'none' ? 'block' : 'none';
   });
 
   // Close on outside click
-  document.addEventListener('click', () => drop.classList.add('hidden'));
+  document.addEventListener('click', () => { drop.style.display = 'none'; });
+  drop.addEventListener('click', e => e.stopPropagation());
 
   // Select country
   list.addEventListener('click', e => {
-    const item = e.target.closest('.csd-item');
+    const item = e.target.closest('[data-code]');
     if (!item) return;
     const code = item.dataset.code;
     const c = CSEL_COUNTRIES.find(x => x.code === code);
     if (!c) return;
 
-    // Update UI
+    selected = code;
     flag.textContent = c.flag;
     name.textContent = c.name;
-    drop.classList.add('hidden');
-    list.querySelectorAll('.csd-item').forEach(el => el.classList.remove('active'));
-    item.classList.add('active');
-
-    // Save to localStorage
+    drop.style.display = 'none';
     localStorage.setItem('wos_country', code);
-    cselSelected = code;
+    buildList();
 
-    // Navigate to Country Intelligence page with this country
+    // Go to Country Intelligence page
     window.location.hash = '#country';
-    // Signal country.js to load this country
+    // Tell country.js which country was selected
     window.dispatchEvent(new CustomEvent('countrySelected', { detail: { code } }));
   });
 }
 
-// Wait for DOM ready
+// Init after DOM is ready
 if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initCountrySelector);
+  document.addEventListener('DOMContentLoaded', initSidebarCountrySelector);
 } else {
-  setTimeout(initCountrySelector, 500);
+  setTimeout(initSidebarCountrySelector, 600);
 }
 </script>
 
