@@ -1,451 +1,551 @@
 // =====================================================
-// WealthOS AI — Global Research Intelligence Page
-// Institutional-grade investment research
+// WealthOS AI — Global Research Intelligence (Country-Aware + Drill-Down)
 // =====================================================
 
+// ---- Country-specific research data ----
+const COUNTRY_RESEARCH = {
+
+  IN: {
+    label: '🇮🇳 India', color: '#f97316',
+    summary: {
+      gdp: '$3.9T', growth: '+6.8%', inflation: '4.9%', rank: 1, score: 9.2,
+      headline: 'India is the world\'s fastest-growing major economy. Young demographics (avg age 28), booming IT exports ($217B), manufacturing push via PLI schemes, and UPI digital revolution make it the top emerging market bet for 2025–2035.',
+      bestFor: 'IT Services, Pharma, Manufacturing, Renewables, FMCG, Banking',
+      avoid: 'Pure exporters exposed to INR depreciation, overleveraged PSU companies',
+      topRec: [
+        { type: '🏆 Best Stock', pick: 'Reliance Industries (RELIANCE)', why: 'Jio+Retail+Green Energy triad. India\'s largest company. Mukesh Ambani vision. $220B mkt cap.', score: '9.0/10' },
+        { type: '🏭 Best Industry', pick: 'IT Services + AI', why: 'TCS, Infosys, Wipro benefiting from AI transformation projects. $217B annual exports. Growing.', score: '9.2/10' },
+        { type: '📦 Best Product', pick: 'Pharma Generics + API', why: 'India = world\'s pharmacy. 20% of global generic exports. US patent cliffs = $200B opportunity.', score: '8.8/10' },
+        { type: '💎 Long-term (10yr)', pick: 'India IT + Infra + Renewables', why: 'India becomes $10T economy by 2035. Infrastructure investment of $1.4T. 500GW renewable target.', score: '9.5/10' },
+      ]
+    },
+    companies: [
+      { sym: 'RELIANCE', name: 'Reliance Industries', sector: 'Conglomerate', rating: 'STRONG BUY', score: 9.0,
+        rev: '₹9.74L Cr', profit: '₹69,621 Cr', margin: '7.2%', mktCap: '₹19.9L Cr', growth: '+12%',
+        moat: 'India\'s largest company. Jio (500M telecom users = India\'s largest). Reliance Retail (India\'s #1 retailer). Jamnagar = world\'s largest single-site refinery. Chairman Mukesh Ambani = vision & execution.',
+        risks: 'Succession planning, green energy capex delays, oil price volatility, FMCG competition',
+        future: 'Jio Financial Services (NBFC + insurance), Green Hydrogen (₹75,000 Cr investment), New Energy (solar cells, batteries), Global retail expansion',
+        financials: { pe: '28x', pb: '2.1x', roe: '9%', debt: 'Medium', dividend: '0.3%', eps: '₹98', target: '₹3,500' },
+        desc: 'India\'s most valuable conglomerate. Founded by Dhirubhai Ambani in 1966. Revenue spans petrochemicals (O2C), retail (Reliance Retail), telecom (Jio) and new energy. Mukesh Ambani is India\'s richest person ($120B net worth).'
+      },
+      { sym: 'TCS', name: 'Tata Consultancy Services', sector: 'IT Services', rating: 'BUY', score: 8.8,
+        rev: '₹2.41L Cr', profit: '₹46,099 Cr', margin: '19.1%', mktCap: '₹13.8L Cr', growth: '+8%',
+        moat: 'India\'s largest IT company. 600K+ employees. Serves Fortune 500 globally. Part of TATA Group (most trusted brand in India). Long-term multi-year contracts. Revenue visibility excellent.',
+        risks: 'US recession risk (cuts IT budgets), immigration policy (US H1-B visa), wage inflation, AI automation replacing some IT work',
+        future: 'AI-led IT services (TCS AI Cloud), Generative AI projects for clients, Hiring freeze lifting as AI demand grows, US + Europe expansion',
+        financials: { pe: '30x', pb: '13x', roe: '52%', debt: 'Zero', dividend: '2.1%', eps: '₹127', target: '₹4,500' },
+        desc: 'India\'s IT flagship. Founded 1968, went public 2004. Provides software development, testing, consulting & BPO to 150+ countries. Revenue: $29B+. Clients: Apple, Google, Walmart, Airbus, ABN AMRO. Part of TATA Group.'
+      },
+      { sym: 'HDFCBANK', name: 'HDFC Bank', sector: 'Private Banking', rating: 'BUY', score: 8.7,
+        rev: '₹1.66L Cr (NII)', profit: '₹60,812 Cr', margin: '37%', mktCap: '₹12.4L Cr', growth: '+18%',
+        moat: 'India\'s largest private bank. Known for ZERO bad loans culture. Best NPA ratios in industry. 8,738 branches. Digital leadership (HDFC Bank app = India\'s most used banking app).',
+        risks: 'Integration of HDFC merger (complete), margin pressure from rate cycle, rising credit costs, competition from fintechs',
+        future: 'Rural banking expansion, Home loan growth (HDFC Ltd merged), MSME lending push, 3000+ new branches planned',
+        financials: { pe: '18x', pb: '2.8x', roe: '17%', debt: 'N/A (bank)', dividend: '1.4%', eps: '₹92', target: '₹2,100' },
+        desc: 'India\'s most trusted private bank. Founded 1994. Consistently voted India\'s best bank. 8,738 branches, 21,163 ATMs. Completed merger with HDFC Ltd (India\'s largest housing finance company) in 2023. Credit card leader.'
+      },
+      { sym: 'INFY', name: 'Infosys', sector: 'IT Services', rating: 'BUY', score: 8.5,
+        rev: '₹1.53L Cr', profit: '₹26,248 Cr', margin: '17.1%', mktCap: '₹6.6L Cr', growth: '+5%',
+        moat: 'India\'s 2nd largest IT. Strong AI + cloud expertise. Cobalt cloud platform. 100+ Fortune 500 clients. Narayana Murthy legacy — gold standard governance.',
+        risks: 'Slower deal ramp-up, US macro sensitivity, CEO transitions, competition from TCS/Wipro/Accenture',
+        future: 'Generative AI: Infosys Topaz platform, US government contracts, European expansion, AI-led cost optimization for global clients',
+        financials: { pe: '26x', pb: '7x', roe: '32%', debt: 'Zero', dividend: '2.8%', eps: '₹61', target: '₹1,900' },
+        desc: 'Founded 1981 by Narayana Murthy with ₹10,000. India\'s IT success story. Provides consulting, technology, and outsourcing to 50+ countries. Revenue: $18.5B. Known for world-class campus, ethical governance, and consistent growth.'
+      },
+      { sym: 'ICICIBANK', name: 'ICICI Bank', sector: 'Private Banking', rating: 'STRONG BUY', score: 8.9,
+        rev: '₹1.32L Cr (NII)', profit: '₹44,869 Cr', margin: '34%', mktCap: '₹8.4L Cr', growth: '+28%',
+        moat: 'India\'s fastest-growing large private bank. Sandeep Bakhshi\'s transformation — from distressed PSU-like bank to India\'s best-run lender. iMobile Pay = India\'s best banking app. Technology-first culture.',
+        risks: 'Retail credit cycle risks, competition from HDFC Bank, international operations (UK, Canada, US)',
+        future: 'MSME lending ($50B opportunity), Merchant acquiring, Embedded finance, API banking ecosystem',
+        financials: { pe: '19x', pb: '3.5x', roe: '18%', debt: 'N/A', dividend: '1.0%', eps: '₹63', target: '₹1,500' },
+        desc: 'India\'s 2nd largest private bank by assets. Founded 1994. Completely transformed under CEO Sandeep Bakhshi (2018–present) — clean balance sheet, digital-first, consistent ROE improvement. Ranked India\'s most admired bank 2024.'
+      },
+      { sym: 'BAJFINANCE', name: 'Bajaj Finance', sector: 'NBFC / Consumer Finance', rating: 'BUY', score: 8.6,
+        rev: '₹55,127 Cr', profit: '₹14,451 Cr', margin: '26%', mktCap: '₹4.3L Cr', growth: '+28%',
+        moat: 'India\'s most valuable NBFC. Consumer durables financing (zero-cost EMI). 88M customers. 3700 products offered on Bajaj EMI cards. Fastest customer acquisition in India\'s financial services.',
+        risks: 'Consumer credit stress in unsecured loans, RBI regulatory scrutiny, rising NPA in microfinance',
+        future: 'Bajaj Housing Finance IPO, International expansion, Insurance distribution, 150M customer target by 2027',
+        financials: { pe: '29x', pb: '5.2x', roe: '22%', debt: 'High (by nature)', dividend: '0.5%', eps: '₹233', target: '₹8,500' },
+        desc: 'India\'s most profitable NBFC. Started as consumer durable financier at Bajaj showrooms. Now: consumer loans, SME loans, home loans, insurance. Raj Vikash Verma (Sanjiv Bajaj group). India\'s leading FinTech-NBFC hybrid.'
+      },
+      { sym: 'LT', name: 'Larsen & Toubro (L&T)', sector: 'Engineering & Infrastructure', rating: 'STRONG BUY', score: 8.8,
+        rev: '₹2.21L Cr', profit: '₹13,059 Cr', margin: '5.9%', mktCap: '₹4.9L Cr', growth: '+22%',
+        moat: 'India\'s premier engineering company. Executes India\'s biggest infrastructure projects (metros, defense, power, nuclear). ₹5L Cr order book = 3 years of revenue visibility. Defense contracts (Arjun tank, INS Vikrant).',
+        risks: 'Execution delays, raw material cost, government payment delays, high working capital',
+        future: 'Middle East infra boom ($500B projects in UAE/Saudi), India infra (NIP = ₹111L Cr), Green hydrogen EPC, Defense exports',
+        financials: { pe: '35x', pb: '4.8x', roe: '14%', debt: 'Medium', dividend: '1.2%', eps: '₹102', target: '₹4,200' },
+        desc: 'India\'s engineering giant. Founded 1938 by Danish engineers in Mumbai. Built India\'s first reactor, metro systems, airports, ISRO launchpads, aircraft carriers. CEO SN Subrahmanyan. 50,000+ projects delivered. Global presence in 30+ countries.'
+      },
+      { sym: 'SUNPHARMA', name: 'Sun Pharmaceutical', sector: 'Pharmaceuticals', rating: 'BUY', score: 8.4,
+        rev: '₹50,100 Cr', profit: '₹10,127 Cr', margin: '20.2%', mktCap: '₹4.2L Cr', growth: '+11%',
+        moat: 'India\'s largest pharma company. #1 in specialty pharma. USA = 30% revenue (USFDA-approved). Dermatology specialty brand (Ilumya, Cequa). 45 manufacturing plants globally. 1800+ product registrations in US alone.',
+        risks: 'USFDA inspection risks, pricing pressure in generics USA, Dilip Shanghvi succession',
+        future: 'Specialty pharma growth (derma, ophthalmology), India chronic disease market, Biosimilars, Japan expansion',
+        financials: { pe: '38x', pb: '6.8x', roe: '19%', debt: 'Low', dividend: '0.7%', eps: '₹42', target: '₹2,100' },
+        desc: 'India\'s most valuable pharma company. Founded 1983 by Dilip Shanghvi (net worth $24B) with ₹10,000. World\'s 4th largest specialty generic pharma company. 40% revenue from branded generics in India. Present in 100+ countries.'
+      },
+    ],
+    industries: [
+      { icon:'💻', name:'IT & Software Services', size:'$254B (2024)', size2030:'$500B', cagr:'15%', score:9.5,
+        drivers:'AI transformation projects globally, cloud migration, digital banking, US + Europe client growth. India has 60% of world\'s ISO-certified software companies.',
+        risks:'US recession cuts IT budgets, AI automation replacing junior developers, visa restrictions (H1-B)',
+        govSupport:'India IT exports exempted from GST. SEZ benefits. National AI Mission $1.25B. DigiLocker, UPI driving domestic IT demand.',
+        topCos:'TCS, Infosys, Wipro, HCLTech, Tech Mahindra, LTIMindtree, Mphasis, Persistent',
+        invest:'Large-cap IT (TCS, Infosys) for stability; Mid-cap (Persistent, Mphasis) for growth; AI-native IT services companies'
+      },
+      { icon:'💊', name:'Pharmaceuticals & Generics', size:'$55B domestic + $28B exports', size2030:'$130B', cagr:'13%', score:9.0,
+        drivers:'India = world\'s pharmacy (20% global generic exports). US patent cliff ($200B+ drugs going off-patent). China API alternative demand. Domestic chronic disease burden growing.',
+        risks:'USFDA 483 observations/import alerts, pricing pressure in USA, API supply chain from China, currency risk',
+        govSupport:'PLI scheme ₹15,000 Cr for pharma. Bulk drug parks. DPCO (price control) risk. Pharma Vision 2047 target $300B.',
+        topCos:'Sun Pharma, Cipla, Dr. Reddy\'s, Zydus, Aurobindo, Divi\'s Laboratories, Biocon',
+        invest:'API manufacturers (Divi\'s, Laurus), Specialty pharma (Sun, Cipla), Biosimilars (Biocon)'
+      },
+      { icon:'⚡', name:'Renewable Energy', size:'$20B investments/yr', size2030:'$80B+', cagr:'22%', score:9.2,
+        drivers:'India 500GW renewable target by 2030. Solar = cheapest power. Modi government massive push. 100GW+ solar, 60GW wind needed. Green hydrogen export ambition.',
+        risks:'Land acquisition delays, grid integration, module import dependency on China, financing costs',
+        govSupport:'PLI for solar modules ₹24,000 Cr. PM-Kusum (farm solar). ISTS waiver. National Green Hydrogen Mission $2.3B.',
+        topCos:'Adani Green, NTPC Renewables, Torrent Power, Tata Power, JSW Energy, Azure Power, ReNew Power',
+        invest:'Adani Green (scale), NTPC Renewables (PSU safety), Green hydrogen pure-plays, Solar equipment makers'
+      },
+      { icon:'🏦', name:'Banking & Financial Services (BFSI)', size:'$2.7T total assets', size2030:'$6T+', cagr:'16%', score:9.0,
+        drivers:'India\'s credit-to-GDP ratio only 54% (vs 190% China). 500M unbanked/under-banked. UPI revolution. Home loan demand from urbanization. MSME credit gap $530B.',
+        risks:'Consumer credit stress (unsecured loans), NBFC sector risks, RBI regulations, deposit growth lagging',
+        govSupport:'RBI reforms. Jan Dhan Yojana (500M bank accounts). MUDRA loans for MSMEs. Digital banking push.',
+        topCos:'HDFC Bank, ICICI Bank, SBI, Axis Bank, Kotak Mahindra, Bajaj Finance, Chola Finance',
+        invest:'ICICI Bank (best growth), Bajaj Finance (consumer finance king), Small Finance Banks (SFB)'
+      },
+      { icon:'🏗️', name:'Infrastructure & Construction', size:'₹111L Cr NIP (Nat\'l Infra Pipeline)', size2030:'₹150L Cr', cagr:'18%', score:8.8,
+        drivers:'PM Gati Shakti (national infra master plan), 25 new metro projects, 100 smart cities, highway construction (50km/day), airports (100 new/upgraded), defense indigenization.',
+        risks:'Land acquisition, delayed payments from government, raw material cost (steel, cement), skilled labor',
+        govSupport:'Capex ₹11L Cr (FY25 budget), NIP pipeline, Make in India, defense PLI. National Logistics Policy.',
+        topCos:'L&T, Adani Ports, IRB Infrastructure, PNC Infratech, HG Infra, Kalpataru, NCC Limited',
+        invest:'L&T (blue chip), Adani Ports (monopoly), Mid-cap road BOT companies'
+      },
+      { icon:'🚗', name:'Automobile & EV', size:'$220B (2024)', size2030:'$500B', cagr:'17%', score:8.5,
+        drivers:'India = 3rd largest auto market. Two-wheeler EV revolution (Ola, TVS, Hero). Passenger EV (Tata Nexon EV #1). PLI for EV components. Youth income rising.',
+        risks:'EV charging infra lag, battery import cost, Maruti\'s late EV entry, competition from China OEMs',
+        govSupport:'FAME-II scheme. PLI ₹25,938 Cr for auto + EV. Production subsidy for electric 2-wheelers. GST reduction on EVs (5%).',
+        topCos:'Tata Motors, Maruti Suzuki, M&M, Bajaj Auto, TVS Motor, Ola Electric, Hero MotoCorp',
+        invest:'Tata Motors (EV + JLR turnaround), M&M (tractor + EV), Ola Electric (pure EV play)'
+      },
+    ],
+    trade: {
+      exports: { total: '$776B', topItems: [
+        { name: '💻 IT & Software Services', value: '$217B', pct: 28, trend: '+12% YoY', note: 'India\'s biggest forex earner. TCS, Infosys, Wipro, HCL exports to USA/Europe' },
+        { name: '⛽ Petroleum Products', value: '$109B', pct: 14, trend: '+5%', note: 'Refined oil re-exported. Reliance Jamnagar refinery is world\'s largest' },
+        { name: '💊 Pharmaceuticals', value: '$62B', pct: 8, trend: '+9%', note: 'Generic drugs, APIs. India = pharmacy of the world. 200+ countries supplied' },
+        { name: '💎 Gems & Jewellery', value: '$54B', pct: 7, trend: '-3%', note: 'Surat diamond cutting & polishing, Mumbai gold jewellery. Demand soft in 2024' },
+        { name: '👗 Textiles & Apparel', value: '$54B', pct: 7, trend: '+6%', note: 'Cotton, synthetic yarn, ready-made garments. Tirupur, Surat, Ludhiana clusters' },
+        { name: '⚙️ Engineering Goods', value: '$70B', pct: 9, trend: '+11%', note: 'Machinery, auto components, steel, capital goods. Fastest growing export' },
+        { name: '🌾 Agriculture & Food', value: '$54B', pct: 7, trend: '+4%', note: 'Rice (world\'s #1 exporter), spices, sugar, buffalo meat, seafood' },
+      ], topDest: [
+        { country: '🇺🇸 USA', pct: 18, value: '$140B', trend: '⬆️ Growing' },
+        { country: '🇦🇪 UAE', pct: 7, value: '$54B', trend: '⬆️ Growing' },
+        { country: '🇳🇱 Netherlands', pct: 5, value: '$39B', trend: '→ Stable' },
+        { country: '🇨🇳 China', pct: 4, value: '$31B', trend: '⬇️ Declining' },
+        { country: '🇬🇧 UK', pct: 3, value: '$23B', trend: '⬆️ FTA boost' },
+      ]},
+      imports: { total: '$1.026T', topItems: [
+        { name: '🛢️ Crude Oil & Petroleum', value: '$277B', pct: 27, trend: '+18% (Russia oil cheap)', note: 'India imports 85% of oil needs. Iraq, Saudi, Russia = top sources. Price sensitive.' },
+        { name: '📱 Electronics & Components', value: '$185B', pct: 18, trend: '+15%', note: 'Smartphones, telecom equipment, computers, semiconductors — mainly from China' },
+        { name: '🥇 Gold & Precious Metals', value: '$72B', pct: 7, trend: '+30%', note: 'India = world\'s 2nd largest gold consumer. Festivals, weddings, investment demand' },
+        { name: '🧪 Chemicals', value: '$72B', pct: 7, trend: '+8%', note: 'Organic chemicals, APIs from China, plastics, fertilizers' },
+        { name: '⚫ Coal & Minerals', value: '$62B', pct: 6, trend: '+5%', note: 'Power plants need coal. India trying to reduce but still dependent' },
+        { name: '🌱 Edible Oils', value: '$31B', pct: 3, trend: '-5%', note: 'Palm oil from Indonesia/Malaysia. Sunflower from Ukraine (disrupted by war)' },
+      ], topSrc: [
+        { country: '🇨🇳 China', pct: 15, value: '$154B', trend: '⚠️ Dependency risk' },
+        { country: '🇷🇺 Russia', pct: 7, value: '$72B', trend: '⬆️ Oil imports surge post-2022' },
+        { country: '🇦🇪 UAE', pct: 6, value: '$62B', trend: '→ Stable' },
+        { country: '🇺🇸 USA', pct: 5, value: '$51B', trend: '⬆️ Growing' },
+        { country: '🇮🇶 Iraq', pct: 5, value: '$51B', trend: '→ Oil supplier' },
+      ]},
+      balance: '-$250B', note: 'Trade deficit mainly due to oil & electronics. Manageable given strong FX reserves ($650B+) and IT services income.'
+    },
+  },
+
+  US: {
+    label: '🇺🇸 United States', color: '#3b82f6',
+    summary: {
+      gdp: '$28.8T', growth: '+2.5%', inflation: '3.1%', rank: 2, score: 9.0,
+      headline: 'World\'s largest economy and unrivaled AI/tech leader. Dollar dominance, deepest capital markets, and AI supercycle make USA the best developed market for 1–5 year investments.',
+      bestFor: 'AI, Cloud, Defense, Biotech, Finance, Consumer Tech',
+      avoid: 'Interest rate sensitive sectors (REITs, utilities) until rate cuts complete',
+      topRec: [
+        { type: '🏆 Best Stock', pick: 'NVIDIA (NVDA)', why: '80%+ AI chip market. Blackwell GPU supercycle. $83B revenue, 55% margin. AI\'s most essential company.', score: '9.9/10' },
+        { type: '🏭 Best Industry', pick: 'Artificial Intelligence', why: 'NVDA, MSFT, GOOGL, AMZN spending $200B+ on AI capex in 2025. Every company is an AI buyer.', score: '9.8/10' },
+        { type: '📦 Best Product', pick: 'AI Software & APIs', why: 'OpenAI, Anthropic, Mistral. Every enterprise buying AI. SaaS + AI = highest margins.', score: '9.5/10' },
+        { type: '💎 Long-term (10yr)', pick: 'US Tech + AI + Biotech', why: 'Innovation hub. First-mover in AI. Dollar-denominated assets. GLP-1 drugs = healthcare revolution.', score: '9.2/10' },
+      ]
+    },
+    companies: [
+      { sym: 'NVDA', name: 'NVIDIA Corp', sector: 'AI Chips', rating: 'STRONG BUY', score: 9.9, rev: '$83B', profit: '$46B', margin: '55%', mktCap: '$3.3T', growth: '+122%', moat: '80%+ AI GPU market share. CUDA ecosystem has 15M developers — impossible to switch. H100/H200/Blackwell GPUs used by every major AI lab.', risks: 'AMD/Intel competition, China export restrictions, customer concentration (top 5 = 40% revenue)', future: 'Blackwell GPU (2024–2025 supercycle), AI inference market, robotics (Isaac platform), sovereign AI (governments buying own GPUs)', financials: { pe: '35x', pb: '30x', roe: '91%', debt: 'Very Low', dividend: '0.03%', eps: '$1.92', target: '$165' }, desc: 'Founded 1993 by Jensen Huang. Pivoted from gaming GPUs to AI chips. H100 GPU = $30,000 each, 12-month waitlist. Data center revenue grew 427% YoY. Called "most important company in the world" by analysts. Jensen Huang = visionary CEO.' },
+      { sym: 'MSFT', name: 'Microsoft', sector: 'Cloud / AI', rating: 'STRONG BUY', score: 9.5, rev: '$245B', profit: '$88B', margin: '36%', mktCap: '$3.1T', growth: '+16%', moat: 'Azure cloud (#2 globally, fastest growing). Office 365 (400M enterprise users). GitHub Copilot. Teams. LinkedIn (1B users). 49% of OpenAI. Enterprise switching cost = near zero.', risks: 'Antitrust (DOJ scrutiny on OpenAI deal), AI competition from Google, cloud market maturation', future: 'Copilot monetization across all products ($30/month/user), Azure AI revenue ($20B+ run rate), AI agents (autonomous software agents)', financials: { pe: '33x', pb: '12x', roe: '36%', debt: 'Low', dividend: '0.7%', eps: '$11.8', target: '$500' }, desc: 'Founded 1975 by Bill Gates & Paul Allen. CEO Satya Nadella transformed from Windows-centric to cloud-first (2014). Azure is now 43% of revenue. OpenAI partnership (ChatGPT/Copilot) = biggest strategic bet. Most cash-generative software company.' },
+      { sym: 'AAPL', name: 'Apple Inc', sector: 'Consumer Tech', rating: 'BUY', score: 8.8, rev: '$391B', profit: '$97B', margin: '24%', mktCap: '$2.9T', growth: '+2%', moat: '1.4B active devices. App Store ($100B+ revenue/yr). Ecosystem lock-in (iPhone+Mac+Watch+AirPods). Services growing 14%/yr.', risks: 'China revenue 20% (geopolitical), AI late vs Google/MS, iPhone upgrade cycle slowing, App Store antitrust', future: 'Apple Intelligence (AI features), Vision Pro (AR/VR), India manufacturing (30% by 2026), financial services', financials: { pe: '30x', pb: '50x', roe: '160%', debt: 'Low', dividend: '0.5%', eps: '$6.43', target: '$230' }, desc: 'Founded 1976 by Steve Jobs. World\'s most valuable company. Tim Cook era = supply chain mastery + services growth. India as next China (manufacturing + market). Most brand-loyal customers on Earth.' },
+      { sym: 'AMZN', name: 'Amazon', sector: 'Cloud / E-commerce', rating: 'STRONG BUY', score: 9.2, rev: '$620B', profit: '$30B', margin: '5%', mktCap: '$2.1T', growth: '+13%', moat: 'AWS #1 cloud (34% market share, $100B run rate). Prime (200M members). Unmatched logistics network. Alexa.', risks: 'AWS competition (Azure/Google), thin retail margins, regulatory pressure, Bezos departure', future: 'AWS AI services (Bedrock, CodeWhisperer), Healthcare (One Medical), Robotics in warehouses, Kuiper satellite internet', financials: { pe: '35x', pb: '8x', roe: '24%', debt: 'Medium', dividend: 'None', eps: '$5.74', target: '$250' }, desc: 'Founded 1994 by Jeff Bezos as online bookstore. Now: world\'s largest e-commerce + cloud + AI + logistics. AWS profits subsidize retail. Andy Jassy (ex-AWS CEO) now leads. $1T in merchandise moves through Amazon\'s network.' },
+    ],
+    industries: [
+      { icon:'🤖', name:'Artificial Intelligence', size:'$196B (2024)', size2030:'$1.8T', cagr:'37%', score:9.8, drivers:'Every company adopting AI. $200B+ hyperscaler capex. Enterprise AI tools (Copilot, Gemini). AI agents replacing knowledge workers.', risks:'Regulation (EU AI Act, US executive orders), copyright lawsuits, energy consumption', govSupport:'CHIPS Act $52B, National AI Initiative, DARPA AI programs', topCos:'NVIDIA, Microsoft, Google, OpenAI, Anthropic, Meta, Amazon, Palantir', invest:'GPU makers (NVDA), AI cloud (MSFT/AMZN/GOOGL), AI software companies, AI infrastructure (data centers, power)' },
+      { icon:'⚡', name:'Semiconductors', size:'$611B (2024)', size2030:'$1.1T', cagr:'14%', score:9.5, drivers:'AI chips, EV, IoT, 5G, defense — chips power everything. NVDA H100 = most wanted product on Earth.', risks:'China trade war, Taiwan geopolitical risk, fab construction cost overruns', govSupport:'CHIPS Act $52B for fabs in USA. Intel Arizona, TSMC Arizona subsidies.', topCos:'NVIDIA, AMD, Intel, Qualcomm, Broadcom, TSMC (Taiwan), ASML (Netherlands)', invest:'NVDA (AI monopoly), TSMC (fab monopoly), ASML (EUV monopoly), AMD (gaining share)' },
+    ],
+    trade: {
+      exports: { total: '$3.05T', topItems: [
+        { name: '✈️ Aircraft & Aerospace', value: '$150B', pct: 5, trend: '+8%', note: 'Boeing (despite 737 Max issues), defense aircraft, Lockheed F-35, Raytheon missiles' },
+        { name: '⚙️ Machinery & Equipment', value: '$290B', pct: 10, trend: '+6%', note: 'Industrial machines, pumps, turbines, semiconductors' },
+        { name: '⛽ Petroleum & LNG', value: '$427B', pct: 14, trend: '+15%', note: 'USA = world\'s largest oil & gas producer. LNG to Europe replacing Russia' },
+        { name: '💊 Pharma & Chemicals', value: '$366B', pct: 12, trend: '+9%', note: 'Pfizer, Moderna, Abbott. Including GLP-1 drugs now globally in demand' },
+        { name: '💻 Tech Services & Software', value: '$549B', pct: 18, trend: '+14%', note: 'SaaS, cloud services, financial services — biggest export by far' },
+      ], topDest: [
+        { country: '🇨🇦 Canada', pct: 17, value: '$519B', trend: '→ Stable' },
+        { country: '🇲🇽 Mexico', pct: 16, value: '$488B', trend: '⬆️ Nearshoring' },
+        { country: '🇨🇳 China', pct: 7, value: '$214B', trend: '⬇️ Trade war' },
+        { country: '🇯🇵 Japan', pct: 5, value: '$153B', trend: '→ Stable' },
+        { country: '🇬🇧 UK', pct: 4, value: '$122B', trend: '→ Stable' },
+      ]},
+      imports: { total: '$3.82T', topItems: [
+        { name: '📱 Electronics & Machinery', value: '$993B', pct: 26, trend: '+8%', note: 'iPhones (China), semiconductors (Taiwan), computers (China/Vietnam)' },
+        { name: '🚗 Vehicles', value: '$535B', pct: 14, trend: '+5%', note: 'Toyota, BMW, Mercedes, Hyundai. Also EV imports from Korea/Germany' },
+        { name: '⛽ Petroleum', value: '$382B', pct: 10, trend: '-5%', note: 'Despite being #1 producer, still imports heavy crude for refineries' },
+        { name: '💊 Pharma & Medical', value: '$306B', pct: 8, trend: '+12%', note: 'Generics from India, branded from Europe, medical devices' },
+      ], topSrc: [
+        { country: '🇨🇳 China', pct: 14, value: '$535B', trend: '⬇️ Declining (tariffs)' },
+        { country: '🇲🇽 Mexico', pct: 13, value: '$497B', trend: '⬆️ Nearshoring' },
+        { country: '🇨🇦 Canada', pct: 13, value: '$497B', trend: '→ Stable' },
+        { country: '🇩🇪 Germany', pct: 5, value: '$191B', trend: '→ Stable' },
+        { country: '🇯🇵 Japan', pct: 4, value: '$153B', trend: '→ Stable' },
+      ]},
+      balance: '-$773B', note: 'Largest trade deficit in world history. Funded by dollar\'s reserve currency status and foreign investment in US assets.'
+    },
+  },
+
+};
+
+// ---- Default (Global) data when no country selected ----
+const GLOBAL_TOP_COUNTRIES = [
+  { rank:1,  name:'🇮🇳 India',        score:9.2, gdp:'$3.9T',  growth:'+6.8%', why:'Fastest growing G20 economy, young demographics, IT boom, PLI manufacturing', horizon:'5–10 yrs' },
+  { rank:2,  name:'🇺🇸 USA',          score:9.0, gdp:'$28.8T', growth:'+2.5%', why:'AI leadership, dollar dominance, deepest capital markets', horizon:'1–5 yrs' },
+  { rank:3,  name:'🇻🇳 Vietnam',      score:8.7, gdp:'$0.43T', growth:'+6.1%', why:'China+1 manufacturing hub, Samsung & Intel invested heavily', horizon:'5–10 yrs' },
+  { rank:4,  name:'🇸🇦 Saudi Arabia', score:8.5, gdp:'$1.1T',  growth:'+4.2%', why:'Vision 2030 diversification, NEOM, PIF $700B+ investments', horizon:'3–7 yrs' },
+  { rank:5,  name:'🇸🇬 Singapore',    score:8.4, gdp:'$0.52T', growth:'+3.1%', why:'Global financial hub, lowest taxes, best ease of doing business in Asia', horizon:'3–7 yrs' },
+  { rank:6,  name:'🇦🇪 UAE',          score:8.1, gdp:'$0.50T', growth:'+4.5%', why:'Tax-free, Dubai finance hub, AI National Strategy, Golden Visa', horizon:'3–7 yrs' },
+  { rank:7,  name:'🇮🇩 Indonesia',    score:8.0, gdp:'$1.47T', growth:'+5.1%', why:'4th largest population, nickel EV batteries, growing middle class', horizon:'5–10 yrs' },
+  { rank:8,  name:'🇯🇵 Japan',        score:7.5, gdp:'$4.2T',  growth:'+1.3%', why:'Semiconductor revival, robotics, weak yen export boost', horizon:'3–5 yrs' },
+  { rank:9,  name:'🇩🇪 Germany',      score:7.5, gdp:'$4.6T',  growth:'+0.8%', why:'Industrial powerhouse, green energy transition, EU\'s largest economy', horizon:'5–10 yrs' },
+  { rank:10, name:'🇰🇷 South Korea', score:7.9, gdp:'$1.87T', growth:'+2.3%', why:'Semiconductor king (Samsung, SK Hynix), EV batteries, K-culture', horizon:'3–7 yrs' },
+];
+
+
+// ============================================================
+// MAIN RENDER FUNCTION
+// ============================================================
 export function renderResearch(container) {
+  const selCountry = localStorage.getItem('wos_country') || null;
+  const cData = selCountry ? COUNTRY_RESEARCH[selCountry] : null;
+  const label = cData ? cData.label : '🌍 Global';
+  const color = cData ? cData.color : '#6366f1';
+
   const TABS = [
-    { id: 'summary',   label: '🏆 Rankings',       icon: 'fa-star' },
-    { id: 'countries', label: '🌍 Economies',       icon: 'fa-globe' },
-    { id: 'industries',label: '🏭 Industries',      icon: 'fa-industry' },
-    { id: 'companies', label: '🏢 Companies',       icon: 'fa-building' },
-    { id: 'trade',     label: '🚢 Trade',           icon: 'fa-ship' },
-    { id: 'investors', label: '💼 Investors',       icon: 'fa-briefcase' },
-    { id: 'products',  label: '📦 Products',        icon: 'fa-box' },
-    { id: 'stocks',    label: '📈 Markets',         icon: 'fa-chart-line' },
+    { id:'summary',    label:'🏆 Rankings' },
+    { id:'companies',  label:'🏢 Companies' },
+    { id:'industries', label:'🏭 Industries' },
+    { id:'trade',      label:'🚢 Trade' },
+    { id:'investors',  label:'💼 Investors' },
+    { id:'products',   label:'📦 Products' },
+    { id:'markets',    label:'📈 Markets' },
   ];
 
   container.innerHTML = `
     <div class="page-header">
       <div>
         <h1 class="page-title">🔬 Global Research Intelligence</h1>
-        <p class="page-subtitle">Institutional-grade investment research · IMF, World Bank, WTO, OECD data · Updated 2024–2025</p>
+        <p class="page-subtitle">Institutional-grade research · IMF, World Bank, WTO data · 2024–2025
+          <span style="margin-left:10px;padding:3px 12px;background:${color}22;border:1px solid ${color};border-radius:20px;font-size:0.78rem;font-weight:700;color:${color}">${label}</span>
+        </p>
       </div>
     </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:8px;border-bottom:1px solid var(--border-color)">
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:8px;border-bottom:1px solid var(--border-color)">
       ${TABS.map((t,i) => `
-        <button class="res-tab ${i===0?'res-tab-active':''}" data-tab="${t.id}"
-          style="padding:8px 16px;border-radius:20px;border:1.5px solid ${i===0?'#6366f1':'var(--border-color)'};
-          background:${i===0?'rgba(99,102,241,0.2)':'var(--bg-card)'};color:${i===0?'#a5b4fc':'var(--text-secondary)'};
+        <button class="res-tab" data-tab="${t.id}"
+          style="padding:8px 16px;border-radius:20px;border:1.5px solid ${i===0?color:'var(--border-color)'};
+          background:${i===0?color+'22':'var(--bg-card)'};color:${i===0?color:'var(--text-secondary)'};
           cursor:pointer;font-size:0.82rem;font-weight:600;white-space:nowrap;transition:all 0.2s">
           ${t.label}
         </button>
       `).join('')}
     </div>
+
     <div id="res-content"></div>
   `;
 
+  let activeTab = 'summary';
   container.querySelectorAll('.res-tab').forEach(btn => {
     btn.addEventListener('click', () => {
+      activeTab = btn.dataset.tab;
       container.querySelectorAll('.res-tab').forEach(b => {
         b.style.background = 'var(--bg-card)'; b.style.borderColor = 'var(--border-color)'; b.style.color = 'var(--text-secondary)';
       });
-      btn.style.background = 'rgba(99,102,241,0.2)'; btn.style.borderColor = '#6366f1'; btn.style.color = '#a5b4fc';
-      renderTab(btn.dataset.tab);
+      btn.style.background = color + '22'; btn.style.borderColor = color; btn.style.color = color;
+      renderTab(activeTab, cData, color);
     });
   });
 
-  renderTab('summary');
+  renderTab('summary', cData, color);
+}
 
-  function renderTab(id) {
-    const el = document.getElementById('res-content');
-    if (id === 'summary')    el.innerHTML = renderSummary();
-    else if (id === 'countries')  el.innerHTML = renderCountries();
-    else if (id === 'industries') el.innerHTML = renderIndustries();
-    else if (id === 'companies')  el.innerHTML = renderCompanies();
-    else if (id === 'trade')      el.innerHTML = renderTrade();
-    else if (id === 'investors')  el.innerHTML = renderInvestors();
-    else if (id === 'products')   el.innerHTML = renderProducts();
-    else if (id === 'stocks')     el.innerHTML = renderMarkets();
-  }
+function renderTab(id, cData, color) {
+  const el = document.getElementById('res-content');
+  if (id === 'summary')    el.innerHTML = renderSummary(cData, color);
+  else if (id === 'companies')  el.innerHTML = renderCompanies(cData, color);
+  else if (id === 'industries') el.innerHTML = renderIndustries(cData, color);
+  else if (id === 'trade')      el.innerHTML = renderTrade(cData, color);
+  else if (id === 'investors')  el.innerHTML = renderInvestors();
+  else if (id === 'products')   el.innerHTML = renderProducts();
+  else if (id === 'markets')    el.innerHTML = renderMarkets();
+  // Wire drill-down toggles
+  el.querySelectorAll('[data-expand]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = document.getElementById(btn.dataset.expand);
+      if (!target) return;
+      const open = target.style.display !== 'none';
+      target.style.display = open ? 'none' : 'block';
+      btn.innerHTML = open ? '▶ Show Details' : '▼ Hide Details';
+    });
+  });
 }
 
 // ============================================================
-// TAB 1: RANKINGS & RECOMMENDATIONS
+// SUMMARY / RANKINGS TAB
 // ============================================================
-function renderSummary() {
-  const topCountries = [
-    { rank:1, name:'🇮🇳 India',         score:9.2, gdp:'$3.9T', growth:'+6.8%', why:'Fastest growing G20 economy, young demographics, tech boom, PLI schemes', horizon:'5–10 yrs', conf:9 },
-    { rank:2, name:'🇺🇸 USA',           score:8.9, gdp:'$28.8T', growth:'+2.5%', why:'World\'s largest economy, AI leadership, dollar dominance, deep capital markets', horizon:'1–5 yrs', conf:9 },
-    { rank:3, name:'🇻🇳 Vietnam',       score:8.7, gdp:'$0.43T', growth:'+6.1%', why:'China+1 manufacturing hub, FDI surge, Samsung, Intel invested heavily', horizon:'5–10 yrs', conf:8 },
-    { rank:4, name:'🇸🇦 Saudi Arabia',  score:8.5, gdp:'$1.1T', growth:'+4.2%', why:'Vision 2030, NEOM, diversification, $600B+ PIF investments', horizon:'3–7 yrs', conf:8 },
-    { rank:5, name:'🇸🇬 Singapore',     score:8.4, gdp:'$0.52T', growth:'+3.1%', why:'Global financial hub, lowest taxes, best ease of doing business in Asia', horizon:'3–7 yrs', conf:9 },
-    { rank:6, name:'🇩🇪 Germany',       score:7.8, gdp:'$4.6T', growth:'+0.8%', why:'Industrial powerhouse, green energy transition, engineering strength', horizon:'5–10 yrs', conf:7 },
-    { rank:7, name:'🇦🇪 UAE',           score:8.1, gdp:'$0.50T', growth:'+4.5%', why:'Tax-free, global hub, Dubai finance center, AI National Strategy', horizon:'3–7 yrs', conf:8 },
-    { rank:8, name:'🇯🇵 Japan',         score:7.5, gdp:'$4.2T', growth:'+1.3%', why:'Semiconductor revival, robotics, corporate governance reform, weak yen boost', horizon:'3–5 yrs', conf:7 },
-    { rank:9, name:'🇮🇩 Indonesia',     score:8.0, gdp:'$1.47T', growth:'+5.1%', why:'World\'s 4th largest population, nickel for EV batteries, growing middle class', horizon:'5–10 yrs', conf:8 },
-    { rank:10, name:'🇰🇷 South Korea', score:7.9, gdp:'$1.87T', growth:'+2.3%', why:'Semiconductor king (Samsung, SK Hynix), K-culture exports, EV batteries', horizon:'3–7 yrs', conf:8 },
-  ];
-
-  const topIndustries = [
-    { rank:1, name:'🤖 Artificial Intelligence', size:'$196B', cagr:'37%', score:9.8, why:'GPT revolution, enterprise AI adoption, every sector transformation' },
-    { rank:2, name:'⚡ Semiconductors', size:'$611B', cagr:'14%', score:9.5, why:'AI chips (NVDA), data centers, EV, IoT — everything needs chips' },
-    { rank:3, name:'🔋 EV & Batteries', size:'$388B', cagr:'23%', score:9.2, why:'Global EV mandates, carbon neutrality goals, battery innovation' },
-    { rank:4, name:'☀️ Renewable Energy', size:'$928B', cagr:'17%', score:9.0, why:'Energy transition, solar/wind boom, government subsidies globally' },
-    { rank:5, name:'🛡️ Cybersecurity', size:'$245B', cagr:'13%', score:8.8, why:'AI-driven threats, data protection laws, ransomware surge' },
-    { rank:6, name:'🧬 Biotechnology', size:'$512B', cagr:'14%', score:8.7, why:'mRNA vaccines, gene editing, personalized medicine, aging population' },
-    { rank:7, name:'🤖 Robotics & Automation', size:'$78B', cagr:'25%', score:8.8, why:'Labor shortage, Industry 4.0, humanoid robots (Tesla, Figure)' },
-    { rank:8, name:'☁️ Cloud Computing', size:'$677B', cagr:'21%', score:8.6, why:'Digital transformation, AI workloads, SaaS growth' },
-    { rank:9, name:'🛩️ Defense & Aerospace', size:'$2.4T', cagr:'8%', score:8.4, why:'Geopolitical tensions, NATO spending increase, hypersonic tech' },
-    { rank:10, name:'💊 Pharmaceuticals', size:'$1.6T', cagr:'6%', score:8.2, why:'GLP-1 weight-loss drugs, biosimilars, emerging market healthcare' },
-  ];
-
-  const topStocks = [
-    { rank:1, sym:'NVDA',  name:'NVIDIA',          exch:'NASDAQ', why:'AI chip monopoly, 80%+ data center GPU market share', potential:'+40–60%', horizon:'1–2 yrs', score:9.8 },
-    { rank:2, sym:'MSFT',  name:'Microsoft',       exch:'NASDAQ', why:'Azure AI growth, Copilot monetization, enterprise dominance', potential:'+25–35%', horizon:'2–3 yrs', score:9.5 },
-    { rank:3, sym:'TSMC',  name:'Taiwan Semi',     exch:'NYSE',   why:'Only fab making 2nm chips, AI chip demand, no substitute', potential:'+30–50%', horizon:'2–3 yrs', score:9.4 },
-    { rank:4, sym:'AMZN',  name:'Amazon',          exch:'NASDAQ', why:'AWS #1 cloud, AI services, e-commerce recovery, logistics', potential:'+25–40%', horizon:'2–3 yrs', score:9.2 },
-    { rank:5, sym:'RELIANCE', name:'Reliance Ind.', exch:'BSE',  why:'Jio + Retail + Green Energy triad, India growth story', potential:'+30–40%', horizon:'3–5 yrs', score:9.0 },
-    { rank:6, sym:'META',  name:'Meta Platforms',  exch:'NASDAQ', why:'AI ad targeting, WhatsApp monetization, AR/VR long term', potential:'+20–30%', horizon:'2–3 yrs', score:8.8 },
-    { rank:7, sym:'2222.SR', name:'Saudi Aramco',  exch:'Tadawul', why:'World\'s most profitable company, 10M bbl/day, 5.8% dividend', potential:'+15–25%', horizon:'2–5 yrs', score:8.7 },
-    { rank:8, sym:'005930', name:'Samsung Elec.',  exch:'KRX',   why:'HBM memory AI boom, semiconductor cycle recovery', potential:'+25–35%', horizon:'2–3 yrs', score:8.6 },
-    { rank:9, sym:'TCS',   name:'TCS',             exch:'BSE',   why:'IT services leader, AI transformation projects, India premium', potential:'+20–30%', horizon:'3–5 yrs', score:8.5 },
-    { rank:10, sym:'ASML', name:'ASML',            exch:'NASDAQ', why:'Only maker of EUV machines — monopoly on chip manufacturing', potential:'+25–35%', horizon:'2–3 yrs', score:8.8 },
-  ];
-
-  const recommendations = [
-    { type:'🏆 Best Country (10 yr)', pick:'🇮🇳 India', reason:'6.8% GDP growth, 1.4B population, tech services, manufacturing shift from China, PLI schemes driving $26B investment', score:'9.2/10' },
-    { type:'🏭 Best Industry (5 yr)', pick:'🤖 Artificial Intelligence', reason:'$196B → $1.8T by 2030 (37% CAGR). Every sector being transformed. Microsoft, Google, Meta spending $200B+ on AI capex in 2025', score:'9.8/10' },
-    { type:'📦 Best Product', pick:'AI Chips / GPUs', reason:'NVIDIA H100 selling at $30,000 each, 6–12 month waitlist. Data center GPU demand growing 5x by 2027', score:'9.9/10' },
-    { type:'🏢 Best Company', pick:'NVIDIA (NVDA)', reason:'$83B revenue, 55% net margin, 80%+ AI chip market share. Called "most important company in the world" by analysts', score:'9.8/10' },
-    { type:'📈 Best Stock (1–2 yr)', pick:'NVDA / TSMC / MSFT', reason:'AI capex supercycle beneficiaries. NVDA data center revenue grew 427% YoY. Structural not cyclical demand', score:'9.5/10' },
-    { type:'🚀 Best Startup Sector', pick:'AI + HealthTech', reason:'$50B+ VC funding in AI in 2024. Drug discovery AI (Isomorphic/DeepMind), AI agents, robotics startups attracting record rounds', score:'9.3/10' },
-    { type:'💎 Best Long-term (10 yr)', pick:'India + Renewable Energy', reason:'India becomes $10T economy by 2035. Green energy $2T investment needed globally. Combination = generational opportunity', score:'9.0/10' },
-    { type:'⚡ Best Short-term (1 yr)', pick:'US Tech Stocks', reason:'AI monetization kicking in, rate cuts boost valuations, earnings upgrades across Big Tech', score:'8.8/10' },
-  ];
-
-  return `
-    <!-- Final Recommendations -->
-    <div class="card mb-4" style="border:1px solid rgba(99,102,241,0.4);background:linear-gradient(135deg,rgba(99,102,241,0.08),var(--bg-card))">
-      <div class="card-header">
-        <div class="card-title" style="font-size:1.1rem"><i class="fa fa-crown" style="color:#f59e0b"></i> Final Investment Recommendations — 2025</div>
-        <span style="font-size:0.75rem;color:#94a3b8">Sources: IMF WEO, World Bank, Bloomberg, McKinsey, Goldman Sachs research</span>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;padding:16px">
-        ${recommendations.map(r => `
-          <div style="padding:14px 16px;background:rgba(255,255,255,0.04);border-radius:12px;border-left:3px solid #6366f1">
-            <div style="font-size:0.75rem;font-weight:700;color:#6366f1;margin-bottom:4px">${r.type}</div>
-            <div style="font-size:1rem;font-weight:800;color:#f8fafc;margin-bottom:6px">${r.pick}</div>
-            <div style="font-size:0.78rem;color:#94a3b8;line-height:1.5;margin-bottom:8px">${r.reason}</div>
-            <div style="display:inline-block;padding:2px 10px;background:rgba(34,197,94,0.15);border:1px solid #22c55e;border-radius:20px;font-size:0.72rem;font-weight:700;color:#22c55e">Score: ${r.score}</div>
+function renderSummary(cData, color) {
+  if (cData) {
+    const s = cData.summary;
+    return `
+      <!-- Country Banner -->
+      <div class="card mb-4" style="border:1px solid ${color}55;background:linear-gradient(135deg,${color}10,var(--bg-card))">
+        <div style="padding:20px">
+          <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
+            <div style="flex:1;min-width:200px">
+              <h2 style="font-size:1.6rem;font-weight:900;margin:0 0 6px">${cData.label} — Investment Overview</h2>
+              <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px">
+                <span style="padding:3px 10px;background:${color}22;border:1px solid ${color};border-radius:20px;font-size:0.78rem;color:${color}">GDP: ${s.gdp}</span>
+                <span style="padding:3px 10px;background:rgba(34,197,94,0.15);border:1px solid #22c55e;border-radius:20px;font-size:0.78rem;color:#22c55e">Growth: ${s.growth}</span>
+                <span style="padding:3px 10px;background:rgba(245,158,11,0.15);border:1px solid #f59e0b;border-radius:20px;font-size:0.78rem;color:#f59e0b">Inflation: ${s.inflation}</span>
+                <span style="padding:3px 10px;background:rgba(99,102,241,0.15);border:1px solid #6366f1;border-radius:20px;font-size:0.82rem;font-weight:700;color:#a5b4fc">Score: ${s.score}/10</span>
+              </div>
+              <p style="font-size:0.88rem;color:#94a3b8;line-height:1.7;margin:0 0 12px">${s.headline}</p>
+              <div style="font-size:0.82rem;margin-bottom:6px"><span style="color:#22c55e;font-weight:700">✅ Best for: </span><span style="color:#94a3b8">${s.bestFor}</span></div>
+              <div style="font-size:0.82rem"><span style="color:#f59e0b;font-weight:700">⚠️ Avoid: </span><span style="color:#94a3b8">${s.avoid}</span></div>
+            </div>
           </div>
-        `).join('')}
+        </div>
       </div>
-    </div>
 
-    <!-- Top 10 Countries -->
-    <div class="card mb-4">
-      <div class="card-header"><div class="card-title"><i class="fa fa-globe"></i> Top 10 Countries to Invest In — 2025–2030</div></div>
+      <!-- Top Recommendations -->
+      <div class="card mb-4">
+        <div class="card-header"><div class="card-title"><i class="fa fa-crown" style="color:#f59e0b"></i> Top Investment Recommendations</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;padding:16px">
+          ${cData.summary.topRec.map(r => `
+            <div style="padding:14px 16px;background:rgba(255,255,255,0.04);border-radius:12px;border-left:3px solid ${color}">
+              <div style="font-size:0.72rem;font-weight:700;color:${color};margin-bottom:4px">${r.type}</div>
+              <div style="font-size:0.98rem;font-weight:800;color:#f8fafc;margin-bottom:6px">${r.pick}</div>
+              <div style="font-size:0.78rem;color:#94a3b8;line-height:1.5;margin-bottom:8px">${r.why}</div>
+              <span style="padding:2px 10px;background:rgba(34,197,94,0.15);border:1px solid #22c55e;border-radius:20px;font-size:0.72rem;font-weight:700;color:#22c55e">Score: ${r.score}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  // Global rankings
+  return `
+    <div class="card mb-4" style="border:1px solid rgba(99,102,241,0.4)">
+      <div class="card-header"><div class="card-title"><i class="fa fa-globe"></i> Top 10 Countries to Invest — 2025–2030</div></div>
       <div style="overflow-x:auto">
         <table style="width:100%;border-collapse:collapse">
           <thead><tr style="background:var(--bg-elevated)">
-            <th style="padding:10px 14px;text-align:left;font-size:0.78rem;color:#94a3b8">#</th>
-            <th style="padding:10px 14px;text-align:left;font-size:0.78rem;color:#94a3b8">Country</th>
+            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">#</th>
+            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Country</th>
             <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">GDP</th>
             <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">Growth</th>
-            <th style="padding:10px 14px;text-align:left;font-size:0.78rem;color:#94a3b8">Why Invest</th>
+            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Why Invest</th>
             <th style="padding:10px 14px;text-align:center;font-size:0.78rem;color:#94a3b8">Horizon</th>
             <th style="padding:10px 14px;text-align:center;font-size:0.78rem;color:#94a3b8">Score</th>
           </tr></thead>
           <tbody>
-            ${topCountries.map(c => `
+            ${GLOBAL_TOP_COUNTRIES.map(c => `
               <tr style="border-top:1px solid var(--border-color)">
                 <td style="padding:12px 14px;font-weight:900;color:#6366f1;font-size:1.1rem">${c.rank}</td>
-                <td style="padding:12px 14px;font-weight:700;font-size:0.95rem">${c.name}</td>
-                <td style="padding:12px 14px;text-align:right;font-family:monospace;color:#f8fafc">${c.gdp}</td>
+                <td style="padding:12px 14px;font-weight:700">${c.name}</td>
+                <td style="padding:12px 14px;text-align:right;font-family:monospace">${c.gdp}</td>
                 <td style="padding:12px 14px;text-align:right;font-weight:700;color:#22c55e">${c.growth}</td>
-                <td style="padding:12px 14px;font-size:0.78rem;color:#94a3b8;max-width:280px">${c.why}</td>
+                <td style="padding:12px 14px;font-size:0.78rem;color:#94a3b8;max-width:260px">${c.why}</td>
                 <td style="padding:12px 14px;text-align:center;font-size:0.78rem;color:#a5b4fc">${c.horizon}</td>
-                <td style="padding:12px 14px;text-align:center">
-                  <span style="padding:3px 10px;background:rgba(34,197,94,0.15);border:1px solid #22c55e;border-radius:20px;font-size:0.78rem;font-weight:700;color:#22c55e">${c.score}/10</span>
-                </td>
+                <td style="padding:12px 14px;text-align:center"><span style="padding:3px 10px;background:rgba(34,197,94,0.15);border:1px solid #22c55e;border-radius:20px;font-size:0.78rem;font-weight:700;color:#22c55e">${c.score}/10</span></td>
               </tr>
             `).join('')}
           </tbody>
         </table>
-      </div>
-    </div>
-
-    <!-- Top 10 Industries -->
-    <div class="card mb-4">
-      <div class="card-header"><div class="card-title"><i class="fa fa-industry"></i> Top 10 Industries — Highest Growth Potential</div></div>
-      <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse">
-          <thead><tr style="background:var(--bg-elevated)">
-            <th style="padding:10px 14px;text-align:left;font-size:0.78rem;color:#94a3b8">#</th>
-            <th style="padding:10px 14px;text-align:left;font-size:0.78rem;color:#94a3b8">Industry</th>
-            <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">Market Size</th>
-            <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">CAGR</th>
-            <th style="padding:10px 14px;text-align:left;font-size:0.78rem;color:#94a3b8">Why</th>
-            <th style="padding:10px 14px;text-align:center;font-size:0.78rem;color:#94a3b8">Score</th>
-          </tr></thead>
-          <tbody>
-            ${topIndustries.map(i => `
-              <tr style="border-top:1px solid var(--border-color)">
-                <td style="padding:12px 14px;font-weight:900;color:#6366f1;font-size:1.1rem">${i.rank}</td>
-                <td style="padding:12px 14px;font-weight:700">${i.name}</td>
-                <td style="padding:12px 14px;text-align:right;font-family:monospace;color:#f8fafc">${i.size}</td>
-                <td style="padding:12px 14px;text-align:right;font-weight:800;color:#22c55e">${i.cagr}</td>
-                <td style="padding:12px 14px;font-size:0.78rem;color:#94a3b8;max-width:280px">${i.why}</td>
-                <td style="padding:12px 14px;text-align:center">
-                  <span style="padding:3px 10px;background:rgba(99,102,241,0.15);border:1px solid #6366f1;border-radius:20px;font-size:0.78rem;font-weight:700;color:#a5b4fc">${i.score}/10</span>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Top 10 Stocks -->
-    <div class="card mb-4">
-      <div class="card-header"><div class="card-title"><i class="fa fa-chart-line"></i> Top 10 Stocks — Global Best Investment Opportunities</div></div>
-      <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse">
-          <thead><tr style="background:var(--bg-elevated)">
-            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">#</th>
-            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Symbol</th>
-            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Company</th>
-            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Exchange</th>
-            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Why Buy</th>
-            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Potential</th>
-            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Score</th>
-          </tr></thead>
-          <tbody>
-            ${topStocks.map(s => `
-              <tr style="border-top:1px solid var(--border-color)">
-                <td style="padding:12px 14px;font-weight:900;color:#6366f1">${s.rank}</td>
-                <td style="padding:12px 14px;font-weight:800;color:#22c55e;font-family:monospace">${s.sym}</td>
-                <td style="padding:12px 14px;font-weight:600">${s.name}</td>
-                <td style="padding:12px 14px;font-size:0.78rem;color:#94a3b8">${s.exch}</td>
-                <td style="padding:12px 14px;font-size:0.78rem;color:#94a3b8;max-width:260px">${s.why}</td>
-                <td style="padding:12px 14px;font-weight:700;color:#22c55e">${s.potential}</td>
-                <td style="padding:12px 14px;text-align:center">
-                  <span style="padding:3px 10px;background:rgba(34,197,94,0.15);border:1px solid #22c55e;border-radius:20px;font-size:0.78rem;font-weight:700;color:#22c55e">${s.score}/10</span>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-      <div style="padding:12px 16px;background:rgba(245,158,11,0.08);border-top:1px solid rgba(245,158,11,0.2)">
-        <span style="font-size:0.75rem;color:#94a3b8">⚠️ <strong style="color:#f59e0b">Disclaimer:</strong> This is for research purposes only. Past performance ≠ future results. Consult a SEBI/SEC registered advisor before investing. Sources: Bloomberg, Goldman Sachs, Morgan Stanley, IMF (2024–2025).</span>
       </div>
     </div>
   `;
 }
 
 // ============================================================
-// TAB 2: COUNTRY ANALYSIS
+// COMPANIES TAB (with DRILL-DOWN)
 // ============================================================
-function renderCountries() {
-  const countries = [
-    {
-      flag:'🇺🇸', name:'United States', gdp:'$28.8T', gdpGrowth:'+2.5%', inflation:'3.1%', rates:'5.25%',
-      unemployment:'3.7%', fdi:'$349B', ease:'#55', currency:'Dominant (reserve)', stability:'Very High',
-      strengths:'AI leadership, tech innovation, dollar dominance, deep capital markets, entrepreneurship culture',
-      risks:'High debt ($35T), political polarization, trade deficits, aging demographics',
-      outlook3yr:'+2.8%', outlook5yr:'+2.5%', outlook10yr:'+2.2%',
-      bestSectors:'AI, Cloud, Defense, Biotech, Finance', score:9.0,
-      source:'IMF WEO Oct 2024, Federal Reserve, BLS'
-    },
-    {
-      flag:'🇨🇳', name:'China', gdp:'$18.5T', gdpGrowth:'+4.9%', inflation:'0.3%', rates:'3.45%',
-      unemployment:'5.0%', fdi:'$163B', ease:'#31', currency:'CNY (controlled)', stability:'High',
-      strengths:'Manufacturing scale, EV leadership, BRI investments, world\'s largest exports, space program',
-      risks:'Property crisis (Evergrande), aging population, US tech restrictions, Taiwan tensions, debt',
-      outlook3yr:'+4.5%', outlook5yr:'+4.0%', outlook10yr:'+3.5%',
-      bestSectors:'EV, Solar, Robotics, Infrastructure, Chemicals', score:7.8,
-      source:'NBS China, IMF, World Bank 2024'
-    },
-    {
-      flag:'🇮🇳', name:'India', gdp:'$3.9T', gdpGrowth:'+6.8%', inflation:'4.9%', rates:'6.5%',
-      unemployment:'7.8%', fdi:'$70.9B', ease:'#63', currency:'INR (stable)', stability:'High',
-      strengths:'Fastest growing G20, young workforce (avg age 28), IT services, PLI manufacturing push, digital payments UPI',
-      risks:'Infrastructure gaps, income inequality, monsoon dependency, geopolitical neighbors',
-      outlook3yr:'+6.5%', outlook5yr:'+6.8%', outlook10yr:'+6.5%',
-      bestSectors:'IT, Pharma, Manufacturing, Renewables, FMCG', score:9.2,
-      source:'RBI, MoSPI India, IMF, World Bank Oct 2024'
-    },
-    {
-      flag:'🇩🇪', name:'Germany', gdp:'$4.6T', gdpGrowth:'+0.2%', inflation:'2.3%', rates:'4.50%',
-      unemployment:'5.5%', fdi:'$31B', ease:'#22', currency:'EUR (strong)', stability:'Very High',
-      strengths:'Engineering excellence, auto/industrial exports, EU\'s largest economy, green energy transition',
-      risks:'Energy dependency, deindustrialization risk, high energy costs post-Russia war, demographic decline',
-      outlook3yr:'+1.2%', outlook5yr:'+1.5%', outlook10yr:'+1.8%',
-      bestSectors:'Hydrogen, EV supply chain, Industrial AI, Defense', score:7.5,
-      source:'Bundesbank, IMF, ECB, Destatis 2024'
-    },
-    {
-      flag:'🇯🇵', name:'Japan', gdp:'$4.2T', gdpGrowth:'+1.3%', inflation:'2.8%', rates:'0.10%',
-      unemployment:'2.4%', fdi:'$30B', ease:'#29', currency:'JPY (weak — export boost)', stability:'Very High',
-      strengths:'Robotics, semiconductors (revival), auto, ultra-low unemployment, stable governance',
-      risks:'Aging/shrinking population, massive debt (260% GDP), deflation history',
-      outlook3yr:'+1.5%', outlook5yr:'+1.2%', outlook10yr:'+1.0%',
-      bestSectors:'Semiconductors, Robotics, Tourism, Defense', score:7.5,
-      source:'BoJ, Cabinet Office Japan, IMF 2024'
-    },
-    {
-      flag:'🇸🇦', name:'Saudi Arabia', gdp:'$1.1T', gdpGrowth:'+4.2%', inflation:'1.6%', rates:'6.0%',
-      unemployment:'3.5%', fdi:'$36B', ease:'#62', currency:'SAR (pegged to USD)', stability:'High',
-      strengths:'Vision 2030, NEOM megacity, PIF $700B fund, oil revenues funding diversification',
-      risks:'Oil price dependency, regional instability, diversification timeline, human rights concerns',
-      outlook3yr:'+4.0%', outlook5yr:'+3.8%', outlook10yr:'+3.5%',
-      bestSectors:'Tourism, Mining, Tech, Green Energy, Entertainment', score:8.5,
-      source:'Saudi SAMA, IMF, PIF reports 2024'
-    },
-    {
-      flag:'🇦🇪', name:'UAE', gdp:'$504B', gdpGrowth:'+4.5%', inflation:'2.3%', rates:'5.40%',
-      unemployment:'2.7%', fdi:'$30.7B', ease:'#16', currency:'AED (USD pegged)', stability:'Very High',
-      strengths:'Tax-free, strategic location, DIFC financial hub, AI National Strategy, Golden Visa',
-      risks:'Oil dependency, limited domestic market, geopolitical region risks',
-      outlook3yr:'+4.2%', outlook5yr:'+4.0%', outlook10yr:'+3.8%',
-      bestSectors:'AI, FinTech, Tourism, Real Estate, Renewables', score:8.1,
-      source:'CBUAE, IMF, World Bank 2024'
-    },
-    {
-      flag:'🇸🇬', name:'Singapore', gdp:'$517B', gdpGrowth:'+2.6%', inflation:'2.7%', rates:'3.74%',
-      unemployment:'1.9%', fdi:'$92B', ease:'#2', currency:'SGD (managed float)', stability:'Excellent',
-      strengths:'World #2 ease of doing business, global financial hub, no capital gains tax, AI/biotech clusters',
-      risks:'Small domestic market, aging population, housing costs, dependence on global trade',
-      outlook3yr:'+3.0%', outlook5yr:'+2.8%', outlook10yr:'+2.5%',
-      bestSectors:'FinTech, Biotech, AI, Logistics, Private Equity', score:8.4,
-      source:'MAS, MTI Singapore, World Bank 2024'
-    },
-    {
-      flag:'🇰🇷', name:'South Korea', gdp:'$1.87T', gdpGrowth:'+2.3%', inflation:'2.4%', rates:'3.5%',
-      unemployment:'2.7%', fdi:'$17.4B', ease:'#19', currency:'KRW (volatile)', stability:'High',
-      strengths:'Semiconductor powerhouse (Samsung, SK Hynix), K-culture global reach, EV batteries (LG, Samsung SDI)',
-      risks:'North Korea risk, aging population, chaebol concentration, semiconductor cycle',
-      outlook3yr:'+2.5%', outlook5yr:'+2.3%', outlook10yr:'+2.0%',
-      bestSectors:'Semiconductors, EV Batteries, K-pop/Culture, Defense', score:7.9,
-      source:'Bank of Korea, IMF, MSCI 2024'
-    },
-    {
-      flag:'🇻🇳', name:'Vietnam', gdp:'$430B', gdpGrowth:'+6.1%', inflation:'4.5%', rates:'6.0%',
-      unemployment:'2.3%', fdi:'$36.6B', ease:'#70', currency:'VND (managed)', stability:'High',
-      strengths:'China+1 manufacturing winner, Samsung/Intel biggest investors, young population (avg 31), export boom',
-      risks:'Infrastructure, legal system, skilled labor shortage, environmental concerns',
-      outlook3yr:'+6.5%', outlook5yr:'+6.2%', outlook10yr:'+5.8%',
-      bestSectors:'Electronics Manufacturing, Textiles, Tourism, Tech', score:8.7,
-      source:'GSO Vietnam, World Bank, IMF 2024'
-    },
+function renderCompanies(cData, color) {
+  const companies = cData?.companies || [
+    { sym:'NVDA', name:'NVIDIA', sector:'AI Chips', rating:'STRONG BUY', score:9.9, rev:'$83B', profit:'$46B', margin:'55%', mktCap:'$3.3T', growth:'+122%', moat:'80%+ AI GPU market share. CUDA ecosystem = 15M developers.', risks:'AMD competition, China restrictions', future:'Blackwell GPUs, AI inference, robotics', financials:{pe:'35x',pb:'30x',roe:'91%',debt:'Very Low',dividend:'0.03%',eps:'$1.92',target:'$165'}, desc:'AI\'s most essential company. Founded 1993 by Jensen Huang.' },
+    { sym:'MSFT', name:'Microsoft', sector:'Cloud/AI', rating:'STRONG BUY', score:9.5, rev:'$245B', profit:'$88B', margin:'36%', mktCap:'$3.1T', growth:'+16%', moat:'Azure AI, Office365 400M users, GitHub, LinkedIn, 49% OpenAI', risks:'Antitrust, AI competition', future:'Copilot monetization, AI agents', financials:{pe:'33x',pb:'12x',roe:'36%',debt:'Low',dividend:'0.7%',eps:'$11.8',target:'$500'}, desc:'Satya Nadella transformed Microsoft into AI/cloud giant.' },
+    { sym:'AAPL', name:'Apple Inc', sector:'Consumer Tech', rating:'BUY', score:8.8, rev:'$391B', profit:'$97B', margin:'24%', mktCap:'$2.9T', growth:'+2%', moat:'1.4B devices, App Store, ecosystem lock-in', risks:'China risk, AI late entry', future:'Apple Intelligence, Vision Pro, India mfg', financials:{pe:'30x',pb:'50x',roe:'160%',debt:'Low',dividend:'0.5%',eps:'$6.43',target:'$230'}, desc:'World\'s most valuable brand. 1.4B loyal device users.' },
+    { sym:'TSMC', name:'Taiwan Semi', sector:'Semiconductors', rating:'STRONG BUY', score:9.4, rev:'$87B', profit:'$31B', margin:'36%', mktCap:'$900B', growth:'+25%', moat:'Only 2nm chip maker. NVIDIA/Apple/AMD all MUST use TSMC.', risks:'Taiwan geopolitical risk (China)', future:'Arizona fabs, AI chip demand', financials:{pe:'26x',pb:'7x',roe:'28%',debt:'Low',dividend:'1.8%',eps:'$5.91',target:'$220'}, desc:'World\'s most critical manufacturer — every AI chip made here.' },
   ];
 
   return `
-    <div style="display:grid;gap:16px">
-      ${countries.map(c => `
-        <div class="card" style="border-left:3px solid #6366f1">
+    <div style="display:grid;gap:14px">
+      ${companies.map((c, i) => `
+        <div class="card">
           <div style="padding:16px 20px">
-            <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
-              <div style="font-size:3.5rem;line-height:1">${c.flag}</div>
-              <div style="flex:1;min-width:200px">
-                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px">
-                  <h3 style="font-size:1.3rem;font-weight:900;margin:0">${c.name}</h3>
-                  <span style="padding:3px 10px;background:rgba(34,197,94,0.15);border:1px solid #22c55e;border-radius:20px;font-size:0.8rem;font-weight:700;color:#22c55e">Score: ${c.score}/10</span>
+            <!-- Header row -->
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+              <span style="font-family:monospace;font-weight:900;color:#22c55e;font-size:1rem">${c.sym}</span>
+              <strong style="font-size:1.05rem">${c.name}</strong>
+              <span style="padding:2px 8px;background:rgba(99,102,241,0.15);border-radius:6px;font-size:0.72rem;color:#a5b4fc">${c.sector}</span>
+              <span style="padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;
+                background:${c.rating.includes('STRONG')?'rgba(34,197,94,0.2)':'rgba(59,130,246,0.2)'};
+                border:1px solid ${c.rating.includes('STRONG')?'#22c55e':'#3b82f6'};
+                color:${c.rating.includes('STRONG')?'#22c55e':'#3b82f6'}">${c.rating}</span>
+              <span style="padding:3px 10px;background:rgba(245,158,11,0.15);border:1px solid #f59e0b;border-radius:20px;font-size:0.78rem;font-weight:700;color:#f59e0b">${c.score}/10</span>
+              <button data-expand="detail-${i}" style="margin-left:auto;padding:5px 14px;background:${color}22;border:1px solid ${color};border-radius:8px;color:${color};cursor:pointer;font-size:0.78rem;font-weight:600">▶ Show Details</button>
+            </div>
+
+            <!-- Quick stats -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;margin-bottom:12px">
+              ${[['Revenue',c.rev,'#3b82f6'],['Net Profit',c.profit,'#22c55e'],['Net Margin',c.margin,'#22c55e'],['Market Cap',c.mktCap,'#8b5cf6'],['YoY Growth',c.growth,'#f59e0b']].map(([l,v,col])=>`
+                <div style="padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px">
+                  <div style="font-size:0.65rem;color:#94a3b8">${l}</div>
+                  <div style="font-size:0.88rem;font-weight:700;color:${col}">${v}</div>
                 </div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:12px">
-                  ${[
-                    ['GDP', c.gdp, '#3b82f6'],
-                    ['GDP Growth', c.gdpGrowth, '#22c55e'],
-                    ['Inflation', c.inflation, '#f59e0b'],
-                    ['Interest Rate', c.rates, '#8b5cf6'],
-                    ['Unemployment', c.unemployment, '#f97316'],
-                    ['FDI Inflow', c.fdi, '#22c55e'],
-                  ].map(([label, val, color]) => `
-                    <div style="padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px">
-                      <div style="font-size:0.68rem;color:#94a3b8;margin-bottom:2px">${label}</div>
-                      <div style="font-size:0.9rem;font-weight:700;color:${color}">${val}</div>
+              `).join('')}
+            </div>
+
+            <!-- Moat / Risks / Future - always visible -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
+              <div style="padding:8px 10px;background:rgba(34,197,94,0.06);border-radius:8px;border-left:2px solid #22c55e">
+                <div style="font-size:0.65rem;font-weight:700;color:#22c55e;margin-bottom:3px">🏰 COMPETITIVE MOAT</div>
+                <div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${c.moat}</div>
+              </div>
+              <div style="padding:8px 10px;background:rgba(239,68,68,0.06);border-radius:8px;border-left:2px solid #ef4444">
+                <div style="font-size:0.65rem;font-weight:700;color:#ef4444;margin-bottom:3px">⚠️ KEY RISKS</div>
+                <div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${c.risks}</div>
+              </div>
+              <div style="padding:8px 10px;background:rgba(99,102,241,0.06);border-radius:8px;border-left:2px solid #6366f1">
+                <div style="font-size:0.65rem;font-weight:700;color:#6366f1;margin-bottom:3px">🔮 FUTURE CATALYSTS</div>
+                <div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${c.future}</div>
+              </div>
+            </div>
+
+            <!-- DRILL DOWN — hidden by default -->
+            <div id="detail-${i}" style="display:none;margin-top:14px;padding:16px;background:rgba(255,255,255,0.02);border-radius:12px;border:1px solid var(--border-color)">
+              <div style="font-size:0.88rem;font-weight:700;color:#f8fafc;margin-bottom:12px">📊 Deep Dive — ${c.name}</div>
+
+              <!-- About -->
+              <div style="padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:12px">
+                <div style="font-size:0.68rem;font-weight:700;color:#a5b4fc;margin-bottom:4px">📖 ABOUT THE COMPANY</div>
+                <div style="font-size:0.82rem;color:#94a3b8;line-height:1.7">${c.desc || 'Detailed description available in full report.'}</div>
+              </div>
+
+              <!-- Valuation metrics -->
+              ${c.financials ? `
+              <div style="margin-bottom:12px">
+                <div style="font-size:0.68rem;font-weight:700;color:#a5b4fc;margin-bottom:8px">💹 VALUATION METRICS</div>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px">
+                  ${Object.entries(c.financials).map(([k,v]) => `
+                    <div style="padding:8px 10px;background:rgba(99,102,241,0.08);border-radius:8px;border:1px solid rgba(99,102,241,0.2)">
+                      <div style="font-size:0.65rem;color:#94a3b8;text-transform:uppercase">${k}</div>
+                      <div style="font-size:0.9rem;font-weight:700;color:#a5b4fc">${v}</div>
                     </div>
                   `).join('')}
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-                  <div style="padding:10px 12px;background:rgba(34,197,94,0.06);border-radius:8px;border-left:2px solid #22c55e">
-                    <div style="font-size:0.7rem;font-weight:700;color:#22c55e;margin-bottom:4px">✅ STRENGTHS</div>
-                    <div style="font-size:0.78rem;color:#94a3b8;line-height:1.5">${c.strengths}</div>
-                  </div>
-                  <div style="padding:10px 12px;background:rgba(239,68,68,0.06);border-radius:8px;border-left:2px solid #ef4444">
-                    <div style="font-size:0.7rem;font-weight:700;color:#ef4444;margin-bottom:4px">⚠️ RISKS</div>
-                    <div style="font-size:0.78rem;color:#94a3b8;line-height:1.5">${c.risks}</div>
-                  </div>
-                </div>
-                <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center">
-                  <div style="font-size:0.78rem;color:#94a3b8">GDP Forecast: <span style="color:#22c55e;font-weight:700">${c.outlook3yr} (3yr)</span> · <span style="color:#22c55e;font-weight:700">${c.outlook5yr} (5yr)</span> · <span style="color:#22c55e;font-weight:700">${c.outlook10yr} (10yr)</span></div>
-                </div>
-                <div style="margin-top:8px;font-size:0.75rem">
-                  <span style="color:#94a3b8">Best Sectors: </span>
-                  <span style="color:#a5b4fc;font-weight:600">${c.bestSectors}</span>
-                </div>
-                <div style="margin-top:4px;font-size:0.68rem;color:#4b5563">📊 Source: ${c.source}</div>
+              </div>` : ''}
+
+              <!-- Investment verdict -->
+              <div style="padding:12px 16px;background:${c.rating.includes('STRONG')?'rgba(34,197,94,0.08)':'rgba(59,130,246,0.08)'};border-radius:10px;border:1px solid ${c.rating.includes('STRONG')?'rgba(34,197,94,0.3)':'rgba(59,130,246,0.3)'}">
+                <div style="font-size:0.7rem;font-weight:700;color:${c.rating.includes('STRONG')?'#22c55e':'#3b82f6'};margin-bottom:6px">⚖️ INVESTMENT VERDICT</div>
+                <div style="font-size:0.85rem;font-weight:700;color:#f8fafc;margin-bottom:4px">${c.rating} — Score ${c.score}/10</div>
+                <div style="font-size:0.78rem;color:#94a3b8">Strong moat, consistent execution, and structural tailwinds make ${c.name} a core holding for long-term investors. Monitor risks listed above.</div>
               </div>
             </div>
+
           </div>
         </div>
       `).join('')}
     </div>
+    <div style="padding:10px 14px;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:10px;margin-top:8px;font-size:0.75rem;color:#94a3b8">
+      ⚠️ <strong style="color:#f59e0b">Not Financial Advice.</strong> Research only. Data: Bloomberg, company filings, Goldman Sachs, Morgan Stanley (2024–2025). Consult a SEBI/SEC registered advisor.
+    </div>
   `;
 }
 
 // ============================================================
-// TAB 3: INDUSTRY ANALYSIS
+// INDUSTRIES TAB (country-aware + drill-down)
 // ============================================================
-function renderIndustries() {
-  const industries = [
-    { icon:'🤖', name:'Artificial Intelligence', size:'$196B (2024)', size2030:'$1.8T', cagr:'37%', drivers:'LLM adoption, enterprise AI tools, autonomous systems, AI agents', risks:'Regulation (EU AI Act), copyright issues, energy consumption, concentration risk', govSupport:'US CHIPS Act, EU AI investments, India AI Mission $1.25B, China AI development plan', topCountries:'USA, China, UK, Canada, France', topCos:'NVIDIA, Microsoft, Google, Anthropic, OpenAI, Baidu, Mistral', invest:'AI chips, AI software (SaaS), data infrastructure, AI-native companies', score:9.8 },
-    { icon:'⚡', name:'Semiconductors', size:'$611B (2024)', size2030:'$1.1T', cagr:'14%', drivers:'AI chips, IoT, EVs, 5G, military electronics — everything needs chips', risks:'Geopolitical (US-China chip war), Taiwan risk (TSMC), fab construction delays', govSupport:'US CHIPS Act $52B, EU Chips Act €43B, India Semiconductor Mission $10B', topCountries:'Taiwan, South Korea, USA, Netherlands, Japan', topCos:'NVIDIA, TSMC, Samsung, ASML, Intel, Qualcomm, AMD, SK Hynix', invest:'ASML (only EUV maker), TSMC, NVDA, memory chip revival plays', score:9.5 },
-    { icon:'🔋', name:'EV & Battery Technology', size:'$388B (2024)', size2030:'$1.1T', cagr:'23%', drivers:'Government EV mandates (EU 2035 ICE ban), charging infrastructure, falling battery costs', risks:'Lithium/cobalt supply chain, charging infrastructure lag, consumer adoption pace', govSupport:'US IRA $369B, EU Green Deal, India FAME scheme, China NEV subsidies', topCountries:'China, USA, Germany, South Korea, India', topCos:'Tesla, BYD, CATL, LG Energy, Panasonic, Volkswagen, Hyundai', invest:'Battery manufacturers, EV charging networks, lithium miners', score:9.2 },
-    { icon:'☀️', name:'Renewable Energy', size:'$928B (2024)', size2030:'$2.1T', cagr:'17%', drivers:'Net zero commitments (195 countries), solar cost -90% in 10 years, energy security post-Russia war', risks:'Grid stability, land use, critical minerals, intermittency, policy reversal risk', govSupport:'US IRA, EU Green Deal, India 500GW target, Saudi NEOM 100% renewables', topCountries:'China, USA, Germany, India, Spain, Australia', topCos:'NextEra, Ørsted, Vestas, First Solar, Adani Green, NTPC Renewables, BYD', invest:'Solar manufacturers, wind farms, green hydrogen, grid storage', score:9.0 },
-    { icon:'🛡️', name:'Cybersecurity', size:'$245B (2024)', size2030:'$562B', cagr:'13%', drivers:'AI-powered attacks, ransomware surge (cost $8T in 2023), data protection laws (GDPR), cloud migration', risks:'Talent shortage, commoditization of basic security, point solution fatigue', govSupport:'US CISA investments, EU NIS2 directive, India CERT budget increase', topCountries:'USA, Israel, UK, Australia, Singapore', topCos:'Palo Alto Networks, CrowdStrike, Microsoft, Fortinet, Zscaler, Check Point', invest:'Cloud security, AI security, endpoint protection, zero-trust platforms', score:8.8 },
-    { icon:'🧬', name:'Biotechnology & Gene Therapy', size:'$512B (2024)', size2030:'$937B', cagr:'14%', drivers:'mRNA technology (post-COVID), CRISPR gene editing, personalized medicine, aging populations', risks:'FDA approval risk, long development timelines (10+ years), patent cliffs', govSupport:'NIH $47B funding (USA), EU Horizon program, India biotech policy', topCountries:'USA, UK, Germany, Switzerland, Denmark', topCos:'Moderna, BioNTech, Genentech, Regeneron, AstraZeneca, Novo Nordisk (GLP-1)', invest:'GLP-1 weight loss drugs (Ozempic category), gene therapy, AI drug discovery', score:8.7 },
-    { icon:'🤖', name:'Robotics & Automation', size:'$78B (2024)', size2030:'$218B', cagr:'25%', drivers:'Labor shortages globally, Industry 4.0, humanoid robots (Tesla Optimus, Figure AI, Boston Dynamics)', risks:'High upfront costs, technical limitations of humanoids, worker resistance', govSupport:'Japan Robot Strategy, Germany Industry 4.0, Made in China 2025', topCountries:'Japan, China, USA, Germany, South Korea', topCos:'ABB, FANUC, Kuka, Boston Dynamics, Tesla (Optimus), Figure AI, Keyence', invest:'Industrial automation, humanoid robot startups, robotic surgery (Intuitive Surgical)', score:8.8 },
-    { icon:'☁️', name:'Cloud Computing & SaaS', size:'$677B (2024)', size2030:'$1.6T', cagr:'21%', drivers:'AI workloads driving cloud spend, digital transformation, remote work permanence, sovereign cloud', risks:'Hyperscaler concentration (AWS/Azure/GCP = 65%), cost optimization pressure, margin compression', govSupport:'India Digital Public Infrastructure, EU sovereign cloud initiatives, US DOD cloud', topCountries:'USA, India, China, Germany, UK', topCos:'AWS (Amazon), Azure (Microsoft), Google Cloud, Salesforce, ServiceNow, Snowflake', invest:'AI cloud infrastructure, vertical SaaS, data platforms', score:8.6 },
-    { icon:'💊', name:'Pharmaceuticals & GLP-1', size:'$1.6T (2024)', size2030:'$2.2T', cagr:'6%', drivers:'Obesity epidemic (1B people by 2030), GLP-1 drugs (Ozempic, Wegovy), biosimilars, emerging markets', risks:'Patent cliffs, generic competition, pricing pressure (US drug reform), clinical trial failures', govSupport:'NIH funding, India PLI pharma scheme, EU pharma strategy', topCountries:'USA, Germany, Switzerland, UK, India (generics)', topCos:'Novo Nordisk, Eli Lilly, AstraZeneca, Pfizer, Roche, Sun Pharma, Dr. Reddy\'s', invest:'GLP-1 manufacturer supply chain, Indian generic pharma, weight loss market', score:8.2 },
-    { icon:'🛩️', name:'Defense & Aerospace', size:'$2.4T (2024)', size2030:'$3.2T', cagr:'8%', drivers:'Russia-Ukraine war, NATO spending pledges (2% GDP), hypersonic missiles, drone warfare, space race', risks:'Budget cuts risk, geopolitical peace (reduces demand), supply chain for titanium', govSupport:'US defense budget $886B (2024), NATO countries ramping up, India defense self-reliance ($25B)', topCountries:'USA, Russia, France, UK, Germany, India, Israel', topCos:'Lockheed Martin, RTX (Raytheon), BAE Systems, L3Harris, Safran, HAL (India)', invest:'Drone technology, hypersonics, satellite defense, India defense (HAL, BEL)', score:8.4 },
+function renderIndustries(cData, color) {
+  const industries = cData?.industries || [
+    { icon:'🤖', name:'Artificial Intelligence', size:'$196B', size2030:'$1.8T', cagr:'37%', score:9.8, drivers:'LLM adoption, enterprise AI, agentic AI, every sector transforming', risks:'EU AI Act, copyright, energy cost', govSupport:'US CHIPS Act, EU AI, India AI Mission', topCos:'NVIDIA, Microsoft, Google, OpenAI, Anthropic', invest:'GPU chips, AI cloud, AI-native SaaS' },
+    { icon:'⚡', name:'Semiconductors', size:'$611B', size2030:'$1.1T', cagr:'14%', score:9.5, drivers:'AI chips, EVs, 5G, IoT — everything needs chips', risks:'China trade war, Taiwan risk', govSupport:'CHIPS Act $52B, EU Chips Act €43B', topCos:'NVIDIA, TSMC, Samsung, ASML, AMD', invest:'NVDA, TSMC, ASML (monopolies)' },
+    { icon:'🔋', name:'EV & Batteries', size:'$388B', size2030:'$1.1T', cagr:'23%', score:9.2, drivers:'Government EV mandates, battery cost decline', risks:'Charging infra lag, lithium supply', govSupport:'US IRA $369B, EU Green Deal', topCos:'Tesla, BYD, CATL, LG Energy', invest:'Battery makers, charging networks, lithium miners' },
+    { icon:'🛡️', name:'Cybersecurity', size:'$245B', size2030:'$562B', cagr:'13%', score:8.8, drivers:'AI-powered attacks, ransomware, cloud migration', risks:'Talent shortage, commoditization', govSupport:'US CISA, EU NIS2 directive', topCos:'CrowdStrike, Palo Alto, Zscaler, Microsoft', invest:'Zero-trust, AI security, cloud security' },
   ];
 
   return `
-    <div style="display:grid;gap:16px">
-      ${industries.map(ind => `
+    <div style="display:grid;gap:14px">
+      ${industries.map((ind, i) => `
         <div class="card">
           <div style="padding:16px 20px">
-            <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;flex-wrap:wrap">
-              <span style="font-size:2.2rem">${ind.icon}</span>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+              <span style="font-size:2rem">${ind.icon}</span>
               <div style="flex:1">
-                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                  <h3 style="font-size:1.1rem;font-weight:900;margin:0">${ind.name}</h3>
-                  <span style="padding:3px 10px;background:rgba(99,102,241,0.15);border:1px solid #6366f1;border-radius:20px;font-size:0.78rem;font-weight:700;color:#a5b4fc">Score: ${ind.score}/10</span>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                  <strong style="font-size:1.05rem">${ind.name}</strong>
                   <span style="padding:3px 10px;background:rgba(34,197,94,0.15);border:1px solid #22c55e;border-radius:20px;font-size:0.78rem;font-weight:700;color:#22c55e">CAGR: ${ind.cagr}</span>
+                  <span style="padding:3px 10px;background:rgba(99,102,241,0.15);border:1px solid #6366f1;border-radius:20px;font-size:0.78rem;font-weight:700;color:#a5b4fc">${ind.score}/10</span>
                 </div>
               </div>
               <div style="text-align:right">
-                <div style="font-size:0.7rem;color:#94a3b8">2024 Size</div>
-                <div style="font-size:1.1rem;font-weight:800;color:#f8fafc">${ind.size}</div>
+                <div style="font-size:0.7rem;color:#94a3b8">Market Size</div>
+                <div style="font-size:1rem;font-weight:800">${ind.size}</div>
                 <div style="font-size:0.75rem;color:#22c55e">→ ${ind.size2030} by 2030</div>
               </div>
+              <button data-expand="ind-detail-${i}" style="padding:5px 14px;background:${color}22;border:1px solid ${color};border-radius:8px;color:${color};cursor:pointer;font-size:0.78rem;font-weight:600">▶ Show Details</button>
             </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-bottom:10px">
-              <div style="padding:10px 12px;background:rgba(34,197,94,0.06);border-radius:8px;border-left:2px solid #22c55e">
-                <div style="font-size:0.68rem;font-weight:700;color:#22c55e;margin-bottom:4px">📈 GROWTH DRIVERS</div>
-                <div style="font-size:0.78rem;color:#94a3b8;line-height:1.5">${ind.drivers}</div>
+
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+              <div style="padding:8px 10px;background:rgba(34,197,94,0.06);border-radius:8px;border-left:2px solid #22c55e">
+                <div style="font-size:0.65rem;font-weight:700;color:#22c55e;margin-bottom:3px">📈 GROWTH DRIVERS</div>
+                <div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${ind.drivers}</div>
               </div>
-              <div style="padding:10px 12px;background:rgba(239,68,68,0.06);border-radius:8px;border-left:2px solid #ef4444">
-                <div style="font-size:0.68rem;font-weight:700;color:#ef4444;margin-bottom:4px">⚠️ RISKS</div>
-                <div style="font-size:0.78rem;color:#94a3b8;line-height:1.5">${ind.risks}</div>
-              </div>
-              <div style="padding:10px 12px;background:rgba(59,130,246,0.06);border-radius:8px;border-left:2px solid #3b82f6">
-                <div style="font-size:0.68rem;font-weight:700;color:#3b82f6;margin-bottom:4px">🏛️ GOVT SUPPORT</div>
-                <div style="font-size:0.78rem;color:#94a3b8;line-height:1.5">${ind.govSupport}</div>
-              </div>
-              <div style="padding:10px 12px;background:rgba(245,158,11,0.06);border-radius:8px;border-left:2px solid #f59e0b">
-                <div style="font-size:0.68rem;font-weight:700;color:#f59e0b;margin-bottom:4px">💡 INVESTMENT ANGLE</div>
-                <div style="font-size:0.78rem;color:#94a3b8;line-height:1.5">${ind.invest}</div>
+              <div style="padding:8px 10px;background:rgba(239,68,68,0.06);border-radius:8px;border-left:2px solid #ef4444">
+                <div style="font-size:0.65rem;font-weight:700;color:#ef4444;margin-bottom:3px">⚠️ RISKS</div>
+                <div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${ind.risks}</div>
               </div>
             </div>
-            <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:0.78rem">
-              <span><span style="color:#94a3b8">Top Countries: </span><span style="color:#a5b4fc;font-weight:600">${ind.topCountries}</span></span>
-            </div>
-            <div style="margin-top:6px;font-size:0.78rem">
-              <span style="color:#94a3b8">Top Companies: </span><span style="color:#22c55e;font-weight:600">${ind.topCos}</span>
+
+            <!-- DRILL DOWN -->
+            <div id="ind-detail-${i}" style="display:none;margin-top:12px;padding:14px;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid var(--border-color)">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+                <div style="padding:10px 12px;background:rgba(59,130,246,0.06);border-radius:8px;border-left:2px solid #3b82f6">
+                  <div style="font-size:0.65rem;font-weight:700;color:#3b82f6;margin-bottom:3px">🏛️ GOVERNMENT SUPPORT</div>
+                  <div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${ind.govSupport}</div>
+                </div>
+                <div style="padding:10px 12px;background:rgba(245,158,11,0.06);border-radius:8px;border-left:2px solid #f59e0b">
+                  <div style="font-size:0.65rem;font-weight:700;color:#f59e0b;margin-bottom:3px">💡 INVESTMENT ANGLE</div>
+                  <div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${ind.invest}</div>
+                </div>
+              </div>
+              <div style="font-size:0.78rem"><span style="color:#94a3b8">🏢 Top Companies: </span><span style="color:#22c55e;font-weight:600">${ind.topCos}</span></div>
             </div>
           </div>
         </div>
@@ -455,329 +555,200 @@ function renderIndustries() {
 }
 
 // ============================================================
-// TAB 4: COMPANY ANALYSIS
+// TRADE TAB (country-aware + drill-down)
 // ============================================================
-function renderCompanies() {
-  const companies = [
-    { flag:'🇺🇸', sym:'NVDA',  name:'NVIDIA Corp',        sector:'AI Chips',    rev:'$83B', profit:'$46B', margin:'55%', mktCap:'$3.3T', growth:'+122%', moat:'80%+ AI GPU market, CUDA ecosystem lock-in (15M developers)', risks:'AMD/Intel competition, China restrictions, customer concentration (top 5 = 40% revenue)', future:'Blackwell GPU generation, AI inference market, robotics (Isaac)', invest:'STRONG BUY', score:9.9 },
-    { flag:'🇺🇸', sym:'MSFT',  name:'Microsoft',           sector:'Cloud/AI',    rev:'$245B', profit:'$88B', margin:'36%', mktCap:'$3.1T', growth:'+16%', moat:'Azure AI leadership, Office365 (400M users), GitHub Copilot, Teams, LinkedIn', risks:'Antitrust (OpenAI deal), AI competition from Google, cloud market maturation', future:'Copilot monetization across all products, AI agents, Azure AI revenue', invest:'STRONG BUY', score:9.5 },
-    { flag:'🇺🇸', sym:'AAPL',  name:'Apple Inc',           sector:'Consumer Tech',rev:'$391B', profit:'$97B', margin:'24%', mktCap:'$2.9T', growth:'+2%', moat:'1.4B devices, App Store ($100B revenue), switching costs, brand premium, services growth', risks:'China revenue (20%), AI late entry vs Google/MSFT, iPhone upgrade cycle slowdown', future:'Apple Intelligence (AI), Vision Pro, India manufacturing scale-up', invest:'BUY', score:8.8 },
-    { flag:'🇺🇸', sym:'AMZN',  name:'Amazon',              sector:'Cloud/E-com', rev:'$620B', profit:'$30B', margin:'5%', mktCap:'$2.1T', growth:'+13%', moat:'AWS ($100B run rate), Prime loyalty (200M members), logistics network, Alexa AI', risks:'AWS competition, regulatory pressure, thin retail margins', future:'AI services (Amazon Bedrock), logistics robotics, healthcare expansion', invest:'STRONG BUY', score:9.2 },
-    { flag:'🇹🇼', sym:'TSM',   name:'TSMC',                sector:'Semiconductors',rev:'$87B', profit:'$31B', margin:'36%', mktCap:'$900B', growth:'+25%', moat:'Only company making 2nm/3nm chips. NVIDIA/Apple/AMD all depend on TSMC. No real alternative', risks:'Taiwan geopolitical risk (China invasion threat), concentration risk', future:'Arizona fabs, 2nm volume production, AI chip demand surge', invest:'STRONG BUY', score:9.4 },
-    { flag:'🇺🇸', sym:'GOOGL', name:'Alphabet (Google)',   sector:'AI/Ads',      rev:'$350B', profit:'$74B', margin:'21%', mktCap:'$2.1T', growth:'+14%', moat:'90%+ search market share, YouTube (2B users), DeepMind AI, Android, Waymo', risks:'AI search disruption (ChatGPT), antitrust (DOJ case), ad market cyclicality', future:'Gemini AI, Google Cloud AI services, Waymo robotaxi', invest:'BUY', score:8.7 },
-    { flag:'🇩🇰', sym:'NVO',   name:'Novo Nordisk',        sector:'Pharma/GLP-1',rev:'$36B', profit:'$11B', margin:'31%', mktCap:'$550B', growth:'+25%', moat:'Ozempic/Wegovy monopoly in GLP-1 — treating obesity, diabetes. 1B+ potential patients', risks:'Eli Lilly competition (Mounjaro), manufacturing capacity, pricing pressure', future:'Oral semaglutide, heart/kidney disease expansion, supply scale-up', invest:'STRONG BUY', score:9.0 },
-    { flag:'🇳🇱', sym:'ASML',  name:'ASML Holding',        sector:'Semiconductors',rev:'$28B', profit:'$7.9B', margin:'28%', mktCap:'$310B', growth:'+15%', moat:'ONLY maker of EUV lithography machines. Every advanced chip needs ASML equipment. True monopoly', risks:'China export restrictions (40% of revenue), fab construction delays', future:'High-NA EUV (next gen), 2025-2030 EUV installed base doubling', invest:'STRONG BUY', score:9.3 },
-    { flag:'🇮🇳', sym:'RELIANCE',name:'Reliance Industries',sector:'Conglomerate', rev:'$111B', profit:'$8.6B', margin:'8%', mktCap:'$220B', growth:'+12%', moat:'India\'s largest company. Jio (500M users), Reliance Retail (#1 Indian retailer), Jamnagar refinery (world\'s largest)', risks:'Regulatory, succession planning (after Mukesh Ambani), green energy execution risk', future:'Green hydrogen, Jio financial services, global retail expansion', invest:'BUY', score:9.0 },
-    { flag:'🇸🇦', sym:'2222',  name:'Saudi Aramco',        sector:'Energy',      rev:'$440B', profit:'$121B', margin:'28%', mktCap:'$1.8T', growth:'-4%', moat:'World\'s largest oil reserves, lowest production cost ($3/barrel), 10M bbl/day production', risks:'Energy transition (long-term oil demand decline), Saudi Arabia politics', future:'Blue hydrogen, petrochemicals expansion, $70B annual capex', invest:'HOLD/DIVIDEND', score:8.2 },
-  ];
-
+function renderTrade(cData, color) {
+  if (!cData?.trade) return `<div class="card"><div style="padding:40px;text-align:center;color:#94a3b8">Select a country to see trade data</div></div>`;
+  const t = cData.trade;
   return `
-    <div style="display:grid;gap:16px">
-      ${companies.map(c => `
-        <div class="card">
-          <div style="padding:16px 20px">
-            <div style="display:flex;align-items:flex-start;gap:16px;flex-wrap:wrap">
-              <div style="font-size:2rem">${c.flag}</div>
-              <div style="flex:1">
-                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
-                  <span style="font-family:monospace;font-weight:900;color:#22c55e;font-size:1rem">${c.sym}</span>
-                  <h3 style="font-size:1.1rem;font-weight:900;margin:0">${c.name}</h3>
-                  <span style="padding:2px 8px;background:rgba(99,102,241,0.15);border-radius:6px;font-size:0.72rem;color:#a5b4fc">${c.sector}</span>
-                  <span style="padding:3px 10px;border-radius:20px;font-size:0.78rem;font-weight:700;
-                    background:${c.invest.includes('STRONG')?'rgba(34,197,94,0.2)':'rgba(59,130,246,0.2)'};
-                    border:1px solid ${c.invest.includes('STRONG')?'#22c55e':'#3b82f6'};
-                    color:${c.invest.includes('STRONG')?'#22c55e':'#3b82f6'}">${c.invest}</span>
-                  <span style="padding:3px 10px;background:rgba(245,158,11,0.15);border:1px solid #f59e0b;border-radius:20px;font-size:0.78rem;font-weight:700;color:#f59e0b">Score: ${c.score}/10</span>
-                </div>
-                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin-bottom:10px">
-                  ${[['Revenue', c.rev,'#3b82f6'],['Net Profit', c.profit,'#22c55e'],['Net Margin', c.margin,'#22c55e'],['Market Cap', c.mktCap,'#8b5cf6'],['YoY Growth', c.growth,'#f59e0b']].map(([l,v,col])=>`
-                    <div style="padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px">
-                      <div style="font-size:0.65rem;color:#94a3b8">${l}</div>
-                      <div style="font-size:0.88rem;font-weight:700;color:${col}">${v}</div>
-                    </div>
-                  `).join('')}
-                </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">
-                  <div style="padding:8px 10px;background:rgba(34,197,94,0.06);border-radius:8px;border-left:2px solid #22c55e;grid-column:1">
-                    <div style="font-size:0.65rem;font-weight:700;color:#22c55e;margin-bottom:3px">🏰 MOAT</div>
-                    <div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${c.moat}</div>
+    <!-- Export / Import summary cards -->
+    <div class="grid grid-4 mb-4">
+      <div class="stat-card"><div class="stat-icon green"><i class="fa fa-plane-departure"></i></div><div class="stat-label">Total Exports</div><div class="stat-value" style="font-size:1.3rem">${t.exports.total}</div><div class="stat-change positive">Outbound trade</div></div>
+      <div class="stat-card"><div class="stat-icon orange"><i class="fa fa-plane-arrival"></i></div><div class="stat-label">Total Imports</div><div class="stat-value" style="font-size:1.3rem">${t.imports.total}</div><div class="stat-change negative">Inbound trade</div></div>
+      <div class="stat-card"><div class="stat-icon ${t.balance.startsWith('+')?'blue':'red'}"><i class="fa fa-scale-balanced"></i></div><div class="stat-label">Trade Balance</div><div class="stat-value" style="font-size:1.3rem;color:${t.balance.startsWith('+')?'#22c55e':'#ef4444'}">${t.balance}</div><div class="stat-change ${t.balance.startsWith('+')?'positive':'negative'}">${t.balance.startsWith('+')?'Trade Surplus':'Trade Deficit'}</div></div>
+      <div class="stat-card"><div class="stat-icon purple"><i class="fa fa-globe"></i></div><div class="stat-label">Trade Note</div><div class="stat-value" style="font-size:0.72rem;color:#94a3b8;font-weight:400;line-height:1.5;margin-top:4px">${t.note}</div></div>
+    </div>
+
+    <div class="grid grid-2 mb-4">
+      <!-- Exports -->
+      <div class="card">
+        <div class="card-header"><div class="card-title"><i class="fa fa-plane-departure"></i> Export Categories</div><span style="font-size:0.78rem;color:#94a3b8">${t.exports.total} total</span></div>
+        <div style="padding:16px">
+          ${t.exports.topItems.map((item, i) => `
+            <div style="margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:4px">
+                <span style="font-weight:600">${item.name}</span>
+                <span style="color:#22c55e;font-weight:700">${item.value} (${item.pct}%)</span>
+              </div>
+              <div style="background:var(--bg-elevated);border-radius:4px;height:8px;overflow:hidden;margin-bottom:4px">
+                <div style="width:${item.pct}%;height:100%;background:linear-gradient(90deg,#22c55e,#16a34a);border-radius:4px"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#94a3b8">
+                <span>${item.note}</span>
+                <span style="color:${item.trend.includes('⬆')?'#22c55e':item.trend.includes('⬇')?'#ef4444':'#94a3b8'}">${item.trend}</span>
+              </div>
+              ${i < t.exports.topItems.length-1 ? '<div style="border-bottom:1px solid var(--border-color);margin-top:8px"></div>' : ''}
+            </div>
+          `).join('')}
+
+          <div style="margin-top:16px">
+            <div style="font-size:0.75rem;font-weight:700;color:#94a3b8;margin-bottom:8px;text-transform:uppercase">Top Export Destinations</div>
+            ${t.exports.topDest.map(d => `
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border-color)20">
+                <span style="font-size:0.85rem">${d.country}</span>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="width:70px;background:var(--bg-elevated);border-radius:4px;height:5px">
+                    <div style="width:${Math.min(d.pct*3,100)}%;height:100%;background:#22c55e;border-radius:4px"></div>
                   </div>
-                  <div style="padding:8px 10px;background:rgba(239,68,68,0.06);border-radius:8px;border-left:2px solid #ef4444">
-                    <div style="font-size:0.65rem;font-weight:700;color:#ef4444;margin-bottom:3px">⚠️ RISKS</div>
-                    <div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${c.risks}</div>
-                  </div>
-                  <div style="padding:8px 10px;background:rgba(99,102,241,0.06);border-radius:8px;border-left:2px solid #6366f1">
-                    <div style="font-size:0.65rem;font-weight:700;color:#6366f1;margin-bottom:3px">🔮 FUTURE</div>
-                    <div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${c.future}</div>
-                  </div>
+                  <span style="font-size:0.78rem;color:#22c55e;font-weight:600;width:28px">${d.pct}%</span>
+                  <span style="font-size:0.72rem;color:#94a3b8">${d.value}</span>
+                  <span style="font-size:0.72rem">${d.trend}</span>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-    <div style="padding:12px 16px;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:10px;margin-top:8px">
-      <span style="font-size:0.75rem;color:#94a3b8">⚠️ <strong style="color:#f59e0b">Not Financial Advice.</strong> Data from Bloomberg, company filings, Goldman Sachs, Morgan Stanley research (2024–2025). DYOR before investing.</span>
-    </div>
-  `;
-}
-
-// ============================================================
-// TAB 5: TRADE ANALYSIS
-// ============================================================
-function renderTrade() {
-  const tradeData = [
-    { flag:'🇺🇸', country:'USA', exports:'$3.05T', imports:'$3.82T', balance:'-$770B', topExports:'Aircraft, Machinery, Petroleum, Pharma, Semiconductors, Services', topImports:'Electronics, Vehicles, Clothing, Oil, Pharma, Consumer Goods', topPartners:'Canada (17%), Mexico (16%), China (7%), Japan (5%), UK (4%)', future:'AI/software services exports growing, nearshoring to Mexico, LNG export expansion' },
-    { flag:'🇨🇳', country:'China', exports:'$3.38T', imports:'$2.50T', balance:'+$877B', topExports:'Electronics, Machinery, Textiles, EVs, Steel, Chemicals, Furniture', topImports:'Semiconductors, Oil, Iron Ore, Soybeans, LNG, Machinery', topPartners:'USA (15%), EU (14%), ASEAN (13%), Japan (5%), South Korea (5%)', future:'EV exports surge (BYD), Belt & Road trade expansion, Southeast Asia trade growth' },
-    { flag:'🇮🇳', country:'India', exports:'$776B', imports:'$1.026T', balance:'-$250B', topExports:'IT Services ($217B), Petroleum products, Pharma, Gems, Textiles, Engineering', topImports:'Crude Oil (27%), Electronics, Gold, Chemicals, Coal', topPartners:'USA (18%), UAE (7%), Netherlands (5%), China (4%), UK (3%)', future:'Electronics exports (PLI), Defense exports target $5B, Green hydrogen exports' },
-    { flag:'🇩🇪', country:'Germany', exports:'$1.72T', imports:'$1.47T', balance:'+$252B', topExports:'Vehicles, Machinery, Chemicals, Aircraft, Pharma, Electronics', topImports:'Gas (post-Russia alternative sources), Electronics, Vehicles, Chemicals, Food', topPartners:'USA (10%), France (8%), China (8%), Netherlands (8%), UK (5%)', future:'Green tech exports, hydrogen economy, defense exports (post-NATO pledges)' },
-    { flag:'🇯🇵', country:'Japan', exports:'$920B', imports:'$960B', balance:'-$40B', topExports:'Vehicles (25%), Machinery, Electronics, Chemicals, Steel, Ships', topImports:'LNG (30%), Electronics, Food, Chemicals, Oil', topPartners:'USA (19%), China (19%), South Korea (7%), Taiwan (6%)', future:'EV transition (Japan auto risk), semiconductor equipment exports, green tech' },
-    { flag:'🇸🇦', country:'Saudi Arabia', exports:'$410B', imports:'$228B', balance:'+$182B', topExports:'Crude Oil (62%), Petroleum products, Petrochemicals (SABIC), Plastics', topImports:'Machinery, Vehicles, Electronics, Food, Metals', topPartners:'China (20%), India (12%), Japan (12%), South Korea (9%), USA (4%)', future:'Non-oil exports target (Vision 2030), mining (NEOM minerals), defense' },
-    { flag:'🇻🇳', country:'Vietnam', exports:'$370B', imports:'$328B', balance:'+$42B', topExports:'Electronics (Samsung phones 20% of exports), Textiles, Footwear, Seafood, Wood', topImports:'Electronics components, Machinery, Fabric, Steel, Petroleum', topPartners:'USA (30%), China (15%), South Korea (7%), Japan (7%), EU (10%)', future:'China+1 manufacturing hub, semiconductor packaging, green energy exports' },
-  ];
-
-  const futureProducts = [
-    { rank:1, product:'AI Chips (GPUs)', demand2030:'$500B+', cagr:'42%', leaders:'NVIDIA, AMD, Intel, Google TPU', why:'Every AI model needs chips. NVDA H100 = $30K, waitlist 12 months', entry:'HIGH — capital intensive' },
-    { rank:2, product:'EV Batteries (LFP, NMC)', demand2030:'$400B+', cagr:'28%', leaders:'CATL, LG Energy, Panasonic, Samsung SDI', why:'Every EV needs batteries. Demand 5x by 2030', entry:'HIGH — gigafactory scale' },
-    { rank:3, product:'Solar Panels', demand2030:'$380B+', cagr:'19%', leaders:'LONGi Solar, JinkoSolar, First Solar', why:'Cheapest electricity ever. 1TW+ annual additions by 2030', entry:'MEDIUM-HIGH (China dominates)' },
-    { rank:4, product:'GLP-1 Drugs (Obesity)', demand2030:'$130B+', cagr:'35%', leaders:'Novo Nordisk, Eli Lilly', why:'1B obese adults globally, insurance now covering. Ozempic shortage', entry:'VERY HIGH (drug patents, FDA)' },
-    { rank:5, product:'Green Hydrogen', demand2030:'$350B+', cagr:'54%', leaders:'Air Products, Plug Power, Nel ASA', why:'Decarbonizing steel/cement/shipping. Zero carbon fuel of the future', entry:'HIGH (electrolyzer scale)' },
-    { rank:6, product:'Defence Drones', demand2030:'$80B+', cagr:'15%', leaders:'AeroVironment, Shield AI, Israeli startups', why:'Ukraine war proved drone importance. NATO countries all buying', entry:'MEDIUM (specialized)' },
-    { rank:7, product:'Critical Minerals (Lithium, Cobalt, Nickel)', demand2030:'$500B+', cagr:'22%', leaders:'Albemarle, SQM, Glencore', why:'EV + batteries + renewable energy all need critical minerals', entry:'HIGH (mining investment)' },
-    { rank:8, product:'Cybersecurity Software', demand2030:'$350B+', cagr:'13%', leaders:'Palo Alto, CrowdStrike, Zscaler', why:'Every company needs cyber. AI threats increasing', entry:'MEDIUM (software)' },
-  ];
-
-  return `
-    <div class="card mb-4">
-      <div class="card-header"><div class="card-title"><i class="fa fa-ship"></i> Major Countries — Trade Analysis 2024</div></div>
-      <div style="display:grid;gap:12px;padding:16px">
-        ${tradeData.map(t => `
-          <div style="padding:14px 16px;background:rgba(255,255,255,0.03);border-radius:12px;border:1px solid var(--border-color)">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap">
-              <span style="font-size:1.8rem">${t.flag}</span>
-              <strong style="font-size:1rem">${t.country}</strong>
-              <div style="display:flex;gap:8px;flex-wrap:wrap">
-                <span style="font-size:0.8rem;padding:3px 10px;background:rgba(34,197,94,0.1);border-radius:20px;color:#22c55e">Exports: ${t.exports}</span>
-                <span style="font-size:0.8rem;padding:3px 10px;background:rgba(239,68,68,0.1);border-radius:20px;color:#f87171">Imports: ${t.imports}</span>
-                <span style="font-size:0.8rem;padding:3px 10px;background:${t.balance.startsWith('+') ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)'};border-radius:20px;color:${t.balance.startsWith('+') ? '#22c55e' : '#f87171'}">Balance: ${t.balance}</span>
-              </div>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-              <div><span style="font-size:0.7rem;color:#22c55e;font-weight:700">TOP EXPORTS: </span><span style="font-size:0.78rem;color:#94a3b8">${t.topExports}</span></div>
-              <div><span style="font-size:0.7rem;color:#f87171;font-weight:700">TOP IMPORTS: </span><span style="font-size:0.78rem;color:#94a3b8">${t.topImports}</span></div>
-            </div>
-            <div style="font-size:0.76rem;color:#94a3b8"><strong style="color:#a5b4fc">Partners:</strong> ${t.topPartners}</div>
-            <div style="margin-top:6px;font-size:0.76rem;color:#94a3b8"><strong style="color:#f59e0b">Future:</strong> ${t.future}</div>
-          </div>
-        `).join('')}
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-header"><div class="card-title"><i class="fa fa-box"></i> Highest Demand Products — Next 5–10 Years</div></div>
-      <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse">
-          <thead><tr style="background:var(--bg-elevated)">
-            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">#</th>
-            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Product</th>
-            <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">Market 2030</th>
-            <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">CAGR</th>
-            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Top Makers</th>
-            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Why High Demand</th>
-            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Entry Barrier</th>
-          </tr></thead>
-          <tbody>
-            ${futureProducts.map(p => `
-              <tr style="border-top:1px solid var(--border-color)">
-                <td style="padding:12px 14px;font-weight:900;color:#6366f1">${p.rank}</td>
-                <td style="padding:12px 14px;font-weight:700">${p.product}</td>
-                <td style="padding:12px 14px;text-align:right;font-family:monospace;color:#22c55e;font-weight:700">${p.demand2030}</td>
-                <td style="padding:12px 14px;text-align:right;font-weight:800;color:#22c55e">${p.cagr}</td>
-                <td style="padding:12px 14px;font-size:0.78rem;color:#94a3b8">${p.leaders}</td>
-                <td style="padding:12px 14px;font-size:0.78rem;color:#94a3b8;max-width:220px">${p.why}</td>
-                <td style="padding:12px 14px;font-size:0.75rem;color:${p.entry.includes('VERY')?'#ef4444':p.entry.includes('HIGH')?'#f59e0b':'#22c55e'}">${p.entry}</td>
-              </tr>
             `).join('')}
-          </tbody>
-        </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Imports -->
+      <div class="card">
+        <div class="card-header"><div class="card-title"><i class="fa fa-plane-arrival"></i> Import Categories</div><span style="font-size:0.78rem;color:#94a3b8">${t.imports.total} total</span></div>
+        <div style="padding:16px">
+          ${t.imports.topItems.map((item, i) => `
+            <div style="margin-bottom:12px">
+              <div style="display:flex;justify-content:space-between;font-size:0.82rem;margin-bottom:4px">
+                <span style="font-weight:600">${item.name}</span>
+                <span style="color:#f97316;font-weight:700">${item.value} (${item.pct}%)</span>
+              </div>
+              <div style="background:var(--bg-elevated);border-radius:4px;height:8px;overflow:hidden;margin-bottom:4px">
+                <div style="width:${item.pct}%;height:100%;background:linear-gradient(90deg,#f97316,#ea580c);border-radius:4px"></div>
+              </div>
+              <div style="display:flex;justify-content:space-between;font-size:0.72rem;color:#94a3b8">
+                <span>${item.note}</span>
+                <span style="color:${item.trend.includes('⬆')?'#f59e0b':'#94a3b8'}">${item.trend}</span>
+              </div>
+              ${i < t.imports.topItems.length-1 ? '<div style="border-bottom:1px solid var(--border-color);margin-top:8px"></div>' : ''}
+            </div>
+          `).join('')}
+
+          <div style="margin-top:16px">
+            <div style="font-size:0.75rem;font-weight:700;color:#94a3b8;margin-bottom:8px;text-transform:uppercase">Top Import Sources</div>
+            ${t.imports.topSrc.map(s => `
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border-color)20">
+                <span style="font-size:0.85rem">${s.country}</span>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div style="width:70px;background:var(--bg-elevated);border-radius:4px;height:5px">
+                    <div style="width:${Math.min(s.pct*4,100)}%;height:100%;background:#f97316;border-radius:4px"></div>
+                  </div>
+                  <span style="font-size:0.78rem;color:#f97316;font-weight:600;width:28px">${s.pct}%</span>
+                  <span style="font-size:0.72rem;color:#94a3b8">${s.value}</span>
+                  <span style="font-size:0.72rem">${s.trend}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
       </div>
     </div>
   `;
 }
 
 // ============================================================
-// TAB 6: INVESTOR ANALYSIS
+// INVESTORS TAB (global — same always)
 // ============================================================
 function renderInvestors() {
   const investors = [
-    { name:'Warren Buffett / Berkshire Hathaway', aum:'$900B+', top:'Apple (40%), Bank of America, Chevron, Coca-Cola, Kraft Heinz', recent:'Trimmed Apple, added Occidental Petroleum, Ulta Beauty exit', thesis:'Value investing: buy wonderful companies at fair price. Long-term hold. Avoid tech speculation. Dividend focus.', style:'Value/Long-term' },
-    { name:'BlackRock (Larry Fink)', aum:'$10T', top:'Every S&P 500 company via index funds. Active bets: AI infrastructure, climate transition', recent:'Big push into private credit, infrastructure, AI data centers', thesis:'ESG integration + index investing. Shifting to private markets. AI infrastructure opportunity', style:'Index + Active' },
-    { name:'SoftBank Vision Fund (Masa Son)', aum:'$150B', top:'ARM Holdings (90B), ByteDance, OpenAI, Coupang, DoorDash', recent:'ARM IPO success. Back to investing in AI startups aggressively ($1B+ rounds)', thesis:'AI is the biggest bet in human history. Investing in companies that will be powered by artificial intelligence', style:'Mega-bets/VC' },
-    { name:'Temasek (Singapore)', aum:'$300B', top:'DBS Bank, Singapore Airlines, Alibaba, ByteDance, India companies', recent:'Increased India allocation, cut China (Alibaba sold), more Southeast Asia', thesis:'Long-term value, focus on Asia. India seen as major growth opportunity. Sustainability focus.', style:'Sovereign/Long-term' },
-    { name:'Saudi PIF (Crown Prince MBS)', aum:'$700B', top:'Saudi Aramco, NEOM, LIV Golf, Newcastle FC, Lucid Motors, Uber, Noon', recent:'$1.5B gaming push (Nintendo, Nintendo, Activision), sports washing, AI investments', thesis:'Vision 2030 diversification. Move from oil to tech, tourism, entertainment, sports. Build global brand.', style:'Strategic/Diversify' },
-    { name:'Sequoia Capital', aum:'$85B', top:'Apple, Google, Oracle (early), WhatsApp, Stripe, Unity, Snowflake, Airbnb', recent:'Investing in AI: Harvey AI, Mistral, Wayve. Separate US/China/India funds', thesis:'Partner with exceptional founders. AI-native companies are the next wave. India office growing fast.', style:'VC/Growth' },
-    { name:'Bridgewater Associates (Ray Dalio)', aum:'$124B', top:'Macro bets. Gold, TIPS, emerging markets, diversified commodities', recent:'Warning on US debt, China allocation reduced, India growing position', thesis:'All Weather portfolio. Debt cycle analysis. Big concern on US fiscal sustainability. Gold as reserve', style:'Global Macro' },
-    { name:'GIC (Singapore)', aum:'$770B', top:'Real estate globally, infrastructure, public + private equities', recent:'India infra investments ($3B+), US data centers, European logistics', thesis:'30-year investment horizon. Inflation-protected assets. Real assets + private equity focus.', style:'Sovereign/Infrastructure' },
+    { name:'Warren Buffett / Berkshire Hathaway', aum:'$900B+', top:'Apple (40%), Bank of America, Chevron, Coca-Cola', recent:'Trimmed Apple, added Occidental Petroleum', thesis:'Buy wonderful companies at fair price. Long-term hold. Cash-generative businesses.' },
+    { name:'BlackRock (Larry Fink)', aum:'$10T', top:'Every S&P 500 via index. Active: AI infra, climate', recent:'Push into private credit & infrastructure, AI data centers', thesis:'ESG + indexing. Shifting to private markets. AI infrastructure opportunity.' },
+    { name:'SoftBank Vision Fund (Masa Son)', aum:'$150B', top:'ARM Holdings, ByteDance, OpenAI, Coupang', recent:'ARM IPO success. Investing $1B+ rounds in AI startups', thesis:'AI is the biggest bet in human history. Back AI-first companies globally.' },
+    { name:'Temasek (Singapore)', aum:'$300B', top:'DBS Bank, Singapore Airlines, Alibaba, India cos', recent:'Increased India, cut China (sold Alibaba), more SE Asia', thesis:'Long-term value, Asia focus. India = top growth opportunity.' },
+    { name:'Saudi PIF (Crown Prince MBS)', aum:'$700B', top:'Aramco, NEOM, LIV Golf, Lucid Motors, Uber, Noon', recent:'$1.5B gaming (Nintendo, Activision), sports investments, AI push', thesis:'Vision 2030 diversification. Oil → tech, tourism, sports, entertainment.' },
+    { name:'Sequoia Capital', aum:'$85B', top:'Apple, Google (early), WhatsApp, Stripe, Airbnb, Snowflake', recent:'Harvey AI, Mistral AI, Wayve. Separate US/India/China funds', thesis:'Partner with exceptional founders. AI-native companies = next wave.' },
+    { name:'Bridgewater (Ray Dalio)', aum:'$124B', top:'Macro. Gold, TIPS, Emerging Markets, commodities', recent:'Warning on US debt. Reduced China. Growing India position.', thesis:'All Weather. Debt cycle. Big concern on US fiscal trajectory. Gold reserve.' },
+    { name:'GIC Singapore', aum:'$770B', top:'Real estate, infra globally, public + private equities', recent:'India infra $3B+, US data centers, European logistics', thesis:'30-year horizon. Inflation-protected real assets. Private equity focus.' },
   ];
-
-  return `
-    <div style="display:grid;gap:16px">
-      ${investors.map(inv => `
-        <div class="card">
-          <div style="padding:14px 18px">
-            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px">
-              <div>
-                <h3 style="font-size:1rem;font-weight:900;margin:0 0 4px">${inv.name}</h3>
-                <span style="font-size:0.78rem;color:#94a3b8">AUM: <strong style="color:#22c55e">${inv.aum}</strong></span>
-                &nbsp;&nbsp;
-                <span style="padding:2px 8px;background:rgba(99,102,241,0.15);border-radius:6px;font-size:0.72rem;color:#a5b4fc">${inv.style}</span>
-              </div>
-            </div>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px">
-              <div style="padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px">
-                <div style="font-size:0.65rem;font-weight:700;color:#22c55e;margin-bottom:3px">📂 TOP HOLDINGS</div>
-                <div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${inv.top}</div>
-              </div>
-              <div style="padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px">
-                <div style="font-size:0.65rem;font-weight:700;color:#3b82f6;margin-bottom:3px">🆕 RECENT MOVES</div>
-                <div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${inv.recent}</div>
-              </div>
-              <div style="padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px">
-                <div style="font-size:0.65rem;font-weight:700;color:#f59e0b;margin-bottom:3px">🧠 INVESTMENT THESIS</div>
-                <div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${inv.thesis}</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-  `;
+  return `<div style="display:grid;gap:12px">${investors.map(inv=>`
+    <div class="card"><div style="padding:14px 18px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+        <div><h3 style="font-size:0.98rem;font-weight:900;margin:0 0 4px">${inv.name}</h3>
+        <span style="font-size:0.78rem;color:#94a3b8">AUM: <strong style="color:#22c55e">${inv.aum}</strong></span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+        <div style="padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px"><div style="font-size:0.65rem;font-weight:700;color:#22c55e;margin-bottom:3px">📂 TOP HOLDINGS</div><div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${inv.top}</div></div>
+        <div style="padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px"><div style="font-size:0.65rem;font-weight:700;color:#3b82f6;margin-bottom:3px">🆕 RECENT MOVES</div><div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${inv.recent}</div></div>
+        <div style="padding:8px 10px;background:rgba(255,255,255,0.04);border-radius:8px"><div style="font-size:0.65rem;font-weight:700;color:#f59e0b;margin-bottom:3px">🧠 THESIS</div><div style="font-size:0.76rem;color:#94a3b8;line-height:1.5">${inv.thesis}</div></div>
+      </div>
+    </div></div>
+  `).join('')}</div>`;
 }
 
 // ============================================================
-// TAB 7: PRODUCTS
+// PRODUCTS TAB
 // ============================================================
 function renderProducts() {
   const products = [
-    { cat:'🤖 Technology', items:[
-      { name:'AI Software & APIs', size:'$196B', growth:'+37%', margin:'60–80%', opp:'SaaS companies embedding AI, AI API providers (OpenAI, Anthropic), vertical AI apps' },
-      { name:'GPU / AI Chips', size:'$50B chip', growth:'+122%', margin:'55%+', opp:'NVIDIA monopoly. Every data center upgrading. $200B+ capex plans by hyperscalers' },
-      { name:'Cloud Services (IaaS/PaaS)', size:'$677B', growth:'+21%', margin:'35–45%', opp:'AWS, Azure, GCP duopoly + AI workloads driving expansion. Multi-cloud management tools' },
-      { name:'Cybersecurity Software', size:'$245B', growth:'+13%', margin:'25–70%', opp:'Zero-trust, AI security, cloud security. CrowdStrike, Palo Alto, Zscaler' },
-    ]},
-    { cat:'⚡ Energy & Clean Tech', items:[
-      { name:'Solar Panels (Utility)', size:'$382B', growth:'+19%', margin:'15–25%', opp:'Cheapest electricity ever. 1.5TW annual market by 2030. India, MENA, Southeast Asia' },
-      { name:'EV Batteries (LFP)', size:'$200B', growth:'+28%', margin:'10–20%', opp:'CATL, LG Energy, Northvolt. Gigafactory investments needed in every region' },
-      { name:'Green Hydrogen', size:'$2.7B → $350B', growth:'+54%', margin:'TBD', opp:'Decarbonizing steel, cement, shipping. India + Middle East largest production potential' },
-      { name:'Heat Pumps', size:'$80B', growth:'+14%', margin:'20–30%', opp:'Replace gas heating in Europe/North America. Post-Russia war urgency' },
-    ]},
-    { cat:'💊 Healthcare & Pharma', items:[
-      { name:'GLP-1 Weight Loss Drugs', size:'$24B → $130B+', growth:'+35%', margin:'70–80%', opp:'Ozempic/Wegovy/Mounjaro. 1B obese adults. Cardiovascular, kidney, liver benefits emerging' },
-      { name:'Gene Therapy (CRISPR)', size:'$6B → $40B', growth:'+28%', margin:'N/A (early)', opp:'Cure genetic diseases. First CRISPR therapy approved (sickle cell). Casgevy = $2.2M/patient' },
-      { name:'AI Drug Discovery', size:'$1.4B → $26B', growth:'+45%', margin:'High (when approved)', opp:'Isomorphic Labs (DeepMind), Insilico Medicine, Recursion. Cuts drug discovery from 12yr to 3yr' },
-    ]},
-    { cat:'🏗️ Infrastructure & Materials', items:[
-      { name:'Critical Minerals (Li, Co, Ni)', size:'$320B → $770B', growth:'+22%', margin:'Varies', opp:'Everything electrification needs critical minerals. Massive supply deficit coming' },
-      { name:'Data Centers', size:'$238B', growth:'+25%', margin:'20–35%', opp:'AI needs 100x more compute. $400B+ being built. REITs like Equinix, Digital Realty' },
-      { name:'Semiconductors Equipment', size:'$109B', growth:'+15%', margin:'28%+', opp:'ASML (monopoly), Applied Materials, Lam Research. Every fab expansion needs equipment' },
-    ]},
+    { name:'🤖 AI Software & APIs', size:'$196B', growth:'+37%', margin:'60–80%', opp:'Every company buying AI. OpenAI, Anthropic, Mistral. Vertical AI apps. Highest margin software.' },
+    { name:'⚡ AI Chips (GPUs)', size:'$50B chips', growth:'+122%', margin:'55%+', opp:'NVIDIA monopoly. H100 = $30K/chip, 12-month waitlist. $200B+ data center GPU spend in 2025.' },
+    { name:'🔋 EV Batteries (LFP)', size:'$200B', growth:'+28%', margin:'10–20%', opp:'CATL, LG Energy. Every EV needs batteries. Lithium demand 5x by 2030.' },
+    { name:'☀️ Solar Panels (Utility)', size:'$382B', growth:'+19%', margin:'15–25%', opp:'Cheapest electricity ever. 1.5TW annual market by 2030. India MENA SE Asia growth.' },
+    { name:'💊 GLP-1 Drugs (Ozempic)', size:'$24B→$130B', growth:'+35%', margin:'70–80%', opp:'1B obese adults. Novo Nordisk & Eli Lilly racing. Also treats heart, kidney, liver disease.' },
+    { name:'🌿 Green Hydrogen', size:'$2.7B→$350B', growth:'+54%', margin:'TBD', opp:'Decarbonise steel/cement/shipping. India + Middle East = lowest production cost.' },
+    { name:'🛡️ Cybersecurity SaaS', size:'$245B', growth:'+13%', margin:'25–70%', opp:'AI threats increasing. Every company pays. CrowdStrike, Palo Alto, Zscaler.' },
+    { name:'⛏️ Critical Minerals (Li, Co, Ni)', size:'$320B→$770B', growth:'+22%', margin:'Varies', opp:'EV + renewables = mineral demand surge. Massive supply deficit coming 2026–2030.' },
+    { name:'🏗️ Data Centers', size:'$238B', growth:'+25%', margin:'20–35%', opp:'AI needs 100x compute. $400B+ being built globally. REITs + hyperscaler infra plays.' },
+    { name:'🧬 Gene Therapy (CRISPR)', size:'$6B→$40B', growth:'+28%', margin:'High (post-approval)', opp:'First therapy approved (sickle cell $2.2M). Cure genetic diseases. AI drug discovery accelerates.' },
   ];
-
-  return `
-    <div style="display:grid;gap:20px">
-      ${products.map(cat => `
-        <div class="card">
-          <div class="card-header"><div class="card-title">${cat.cat}</div></div>
-          <div style="overflow-x:auto">
-            <table style="width:100%;border-collapse:collapse">
-              <thead><tr style="background:var(--bg-elevated)">
-                <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Product</th>
-                <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">Market Size</th>
-                <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">CAGR</th>
-                <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">Margins</th>
-                <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Investment Opportunity</th>
-              </tr></thead>
-              <tbody>
-                ${cat.items.map(p => `
-                  <tr style="border-top:1px solid var(--border-color)">
-                    <td style="padding:12px 14px;font-weight:700">${p.name}</td>
-                    <td style="padding:12px 14px;text-align:right;font-family:monospace;font-size:0.85rem;color:#f8fafc">${p.size}</td>
-                    <td style="padding:12px 14px;text-align:right;font-weight:800;color:#22c55e">${p.growth}</td>
-                    <td style="padding:12px 14px;text-align:right;font-size:0.85rem;color:#f59e0b">${p.margin}</td>
-                    <td style="padding:12px 14px;font-size:0.78rem;color:#94a3b8;max-width:280px">${p.opp}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-  `;
+  return `<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+    <thead><tr style="background:var(--bg-elevated)">
+      <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Product</th>
+      <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">Market Size</th>
+      <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">CAGR</th>
+      <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">Margins</th>
+      <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Investment Opportunity</th>
+    </tr></thead>
+    <tbody>${products.map(p=>`<tr style="border-top:1px solid var(--border-color)">
+      <td style="padding:12px 14px;font-weight:700">${p.name}</td>
+      <td style="padding:12px 14px;text-align:right;font-family:monospace;color:#f8fafc">${p.size}</td>
+      <td style="padding:12px 14px;text-align:right;font-weight:800;color:#22c55e">${p.growth}</td>
+      <td style="padding:12px 14px;text-align:right;color:#f59e0b">${p.margin}</td>
+      <td style="padding:12px 14px;font-size:0.78rem;color:#94a3b8;max-width:280px">${p.opp}</td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
 }
 
 // ============================================================
-// TAB 8: MARKETS ANALYSIS
+// MARKETS TAB
 // ============================================================
 function renderMarkets() {
   const markets = [
-    { flag:'🇺🇸', name:'S&P 500', sym:'SPX', val:'5,432', pe:'22x', ytd:'+16.8%', mktCap:'$46T', outlook:'Bullish. AI earnings upgrades, Fed rate cuts cycle. Risk: high valuations, election uncertainty. Target: 5,800–6,000 by end 2025 (Goldman Sachs)', score:8.0 },
-    { flag:'🇺🇸', name:'NASDAQ 100', sym:'NDX', val:'19,341', pe:'28x', ytd:'+19.4%', mktCap:'$22T', outlook:'AI stocks driving outperformance. NVDA, MSFT, GOOGL mega-cap. Expensive but growth justifies. Rate-sensitive.', score:8.2 },
-    { flag:'🇮🇳', name:'NIFTY 50', sym:'NSEI', val:'24,000', pe:'23x', ytd:'+12.6%', mktCap:'$4.5T', outlook:'Structural bull market. India fastest-growing economy. FII flows strong. SIP inflows $2.5B/month. Target 30,000 by 2027 (analysts)', score:9.0 },
-    { flag:'🇮🇳', name:'SENSEX', sym:'BSE', val:'79,032', pe:'23x', ytd:'+11.4%', mktCap:'$4.5T', outlook:'Same as NIFTY — India growth story. Large-cap Indian stocks. Premium to EM peers justified by growth outlook.', score:8.8 },
-    { flag:'🇯🇵', name:'Nikkei 225', sym:'N225', val:'38,647', pe:'18x', ytd:'+20.1%', mktCap:'$6.2T', outlook:'Best performing major market YTD. Weak yen boosts exporters. Warren Buffett buying Japanese trading houses. Semiconductor revival.', score:8.0 },
-    { flag:'🇩🇪', name:'DAX 40', sym:'DAX', val:'18,768', pe:'14x', ytd:'+8.6%', mktCap:'$2.1T', outlook:'Cheap valuations (14x PE vs 22x S&P). Energy concerns resolved. German industrial recovery ongoing. AI/automation plays.', score:7.5 },
-    { flag:'🇨🇳', name:'Shanghai Comp.', sym:'SHCOMP', val:'2,980', pe:'12x', ytd:'-5.8%', mktCap:'$9.5T', outlook:'Underperforming due to property crisis, deflation, regulatory crackdowns. Stimulus announced but weak implementation. High risk, contrarian opportunity.', score:5.5 },
-    { flag:'🇬🇧', name:'FTSE 100', sym:'UKX', val:'8,203', pe:'11x', ytd:'+6.8%', mktCap:'$2.4T', outlook:'Very cheap (11x PE). Large commodity/energy weights. Post-Brexit reform agenda. Attractive dividend yields (3.8%). Overlooked by global investors.', score:7.2 },
-    { flag:'🇰🇷', name:'KOSPI', sym:'KS11', val:'2,746', pe:'13x', ytd:'+3.2%', mktCap:'$1.7T', outlook:'Samsung + SK Hynix = AI memory boom. Cheap vs peers. Corporate governance reforms ongoing (Korea Discount elimination). HBM memory supercycle.', score:8.0 },
-    { flag:'🌍', name:'MSCI World', sym:'URTH', val:'3,240', pe:'19x', ytd:'+12.5%', mktCap:'$72T', outlook:'Diversified global exposure. US = 65% weight (US dominance). Best risk-adjusted for long-term passive investors.', score:8.0 },
+    { flag:'🇺🇸', name:'S&P 500', sym:'SPX', val:'5,432', pe:'22x', ytd:'+16.8%', mktCap:'$46T', outlook:'AI earnings upgrades, Fed rate cuts. Target 5,800–6,000 (Goldman Sachs). Expensive but justified by growth.', score:8.0 },
+    { flag:'🇺🇸', name:'NASDAQ 100', sym:'NDX', val:'19,341', pe:'28x', ytd:'+19.4%', mktCap:'$22T', outlook:'AI stocks driving outperformance. NVDA, MSFT, GOOGL mega-cap. Expensive vs history but AI growth justifies.', score:8.2 },
+    { flag:'🇮🇳', name:'NIFTY 50', sym:'NSEI', val:'24,000', pe:'23x', ytd:'+12.6%', mktCap:'$4.5T', outlook:'Structural bull. Fastest-growing economy. SIP inflows $2.5B/month. FII flows strong. Target 30,000 by 2027.', score:9.0 },
+    { flag:'🇯🇵', name:'Nikkei 225', sym:'N225', val:'38,647', pe:'18x', ytd:'+20.1%', mktCap:'$6.2T', outlook:'Best performing major market YTD. Weak yen + Buffett buying + semiconductor revival = sustained rally.', score:8.0 },
+    { flag:'🇩🇪', name:'DAX 40', sym:'DAX', val:'18,768', pe:'14x', ytd:'+8.6%', mktCap:'$2.1T', outlook:'Cheap 14x PE vs 22x S&P. German industrial recovery + AI automation plays. Rate cut beneficiary.', score:7.5 },
+    { flag:'🇨🇳', name:'Shanghai Comp.', sym:'SHCOMP', val:'2,980', pe:'12x', ytd:'-5.8%', mktCap:'$9.5T', outlook:'Property crisis, deflation, regulatory crackdowns. Cheap but risky. Contrarian opportunity only.', score:5.5 },
+    { flag:'🇬🇧', name:'FTSE 100', sym:'UKX', val:'8,203', pe:'11x', ytd:'+6.8%', mktCap:'$2.4T', outlook:'Very cheap 11x PE. Attractive 3.8% dividend yield. Overlooked by global investors = opportunity.', score:7.2 },
+    { flag:'🇰🇷', name:'KOSPI', sym:'KS11', val:'2,746', pe:'13x', ytd:'+3.2%', mktCap:'$1.7T', outlook:'Samsung + SK Hynix = AI memory boom. HBM supercycle. Corporate governance reforms (Korea Discount).', score:8.0 },
   ];
-
-  return `
-    <div class="card mb-4">
-      <div class="card-header">
-        <div class="card-title"><i class="fa fa-chart-line"></i> Global Stock Market Analysis — 2025</div>
-        <span style="font-size:0.75rem;color:#94a3b8">Source: Bloomberg, Goldman Sachs, Morgan Stanley (2025)</span>
-      </div>
-      <div style="overflow-x:auto">
-        <table style="width:100%;border-collapse:collapse">
-          <thead><tr style="background:var(--bg-elevated)">
-            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Market</th>
-            <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">Level</th>
-            <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">P/E</th>
-            <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">YTD</th>
-            <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">Mkt Cap</th>
-            <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Outlook & Analysis</th>
-            <th style="padding:10px 14px;text-align:center;font-size:0.78rem;color:#94a3b8">Score</th>
-          </tr></thead>
-          <tbody>
-            ${markets.map(m => `
-              <tr style="border-top:1px solid var(--border-color)">
-                <td style="padding:12px 14px">
-                  <div style="font-size:1.1rem">${m.flag}</div>
-                  <div style="font-weight:700;font-size:0.88rem">${m.name}</div>
-                  <div style="font-size:0.72rem;color:#94a3b8;font-family:monospace">${m.sym}</div>
-                </td>
-                <td style="padding:12px 14px;text-align:right;font-family:monospace;font-weight:700">${m.val}</td>
-                <td style="padding:12px 14px;text-align:right;font-size:0.85rem;color:${parseInt(m.pe)>20?'#f59e0b':'#22c55e'}">${m.pe}</td>
-                <td style="padding:12px 14px;text-align:right;font-weight:700;color:${m.ytd.startsWith('+')?'#22c55e':'#ef4444'}">${m.ytd}</td>
-                <td style="padding:12px 14px;text-align:right;font-size:0.85rem;color:#94a3b8">${m.mktCap}</td>
-                <td style="padding:12px 14px;font-size:0.78rem;color:#94a3b8;max-width:300px;line-height:1.5">${m.outlook}</td>
-                <td style="padding:12px 14px;text-align:center">
-                  <span style="padding:3px 10px;background:${m.score>=8.5?'rgba(34,197,94,0.15)':m.score>=7?'rgba(99,102,241,0.15)':'rgba(245,158,11,0.15)'};
-                    border:1px solid ${m.score>=8.5?'#22c55e':m.score>=7?'#6366f1':'#f59e0b'};
-                    border-radius:20px;font-size:0.78rem;font-weight:700;
-                    color:${m.score>=8.5?'#22c55e':m.score>=7?'#a5b4fc':'#f59e0b'}">${m.score}/10</span>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-      <div style="padding:12px 16px;background:rgba(245,158,11,0.08);border-top:1px solid rgba(245,158,11,0.2)">
-        <span style="font-size:0.75rem;color:#94a3b8">⚠️ <strong style="color:#f59e0b">Not Financial Advice.</strong> Research only. Data: Bloomberg, Goldman Sachs 2025 outlook, IMF, company filings. Consult a registered advisor before investing. Past performance ≠ future results.</span>
-      </div>
-    </div>
-  `;
+  return `<div class="card"><div class="card-header"><div class="card-title"><i class="fa fa-chart-line"></i> Global Stock Market Scorecard 2025</div></div>
+    <div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse">
+      <thead><tr style="background:var(--bg-elevated)">
+        <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Market</th>
+        <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">Level</th>
+        <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">P/E</th>
+        <th style="padding:10px 14px;text-align:right;font-size:0.78rem;color:#94a3b8">YTD</th>
+        <th style="padding:10px 14px;font-size:0.78rem;color:#94a3b8">Outlook</th>
+        <th style="padding:10px 14px;text-align:center;font-size:0.78rem;color:#94a3b8">Score</th>
+      </tr></thead>
+      <tbody>${markets.map(m=>`<tr style="border-top:1px solid var(--border-color)">
+        <td style="padding:12px 14px"><div>${m.flag} <strong>${m.name}</strong></div><div style="font-size:0.72rem;color:#94a3b8;font-family:monospace">${m.sym} · ${m.mktCap}</div></td>
+        <td style="padding:12px 14px;text-align:right;font-family:monospace;font-weight:700">${m.val}</td>
+        <td style="padding:12px 14px;text-align:right;color:${parseInt(m.pe)>20?'#f59e0b':'#22c55e'}">${m.pe}</td>
+        <td style="padding:12px 14px;text-align:right;font-weight:700;color:${m.ytd.startsWith('+')?'#22c55e':'#ef4444'}">${m.ytd}</td>
+        <td style="padding:12px 14px;font-size:0.78rem;color:#94a3b8;max-width:280px;line-height:1.5">${m.outlook}</td>
+        <td style="padding:12px 14px;text-align:center"><span style="padding:3px 10px;background:${m.score>=8.5?'rgba(34,197,94,0.15)':m.score>=7?'rgba(99,102,241,0.15)':'rgba(245,158,11,0.15)'};border:1px solid ${m.score>=8.5?'#22c55e':m.score>=7?'#6366f1':'#f59e0b'};border-radius:20px;font-size:0.78rem;font-weight:700;color:${m.score>=8.5?'#22c55e':m.score>=7?'#a5b4fc':'#f59e0b'}">${m.score}/10</span></td>
+      </tr>`).join('')}</tbody>
+    </table></div>
+    <div style="padding:10px 14px;background:rgba(245,158,11,0.06);border-top:1px solid rgba(245,158,11,0.2);font-size:0.75rem;color:#94a3b8">⚠️ <strong style="color:#f59e0b">Not Financial Advice.</strong> Bloomberg, Goldman Sachs 2025, IMF data. Consult registered advisor.</div>
+  </div>`;
 }
