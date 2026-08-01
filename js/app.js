@@ -31,6 +31,7 @@ import { renderLearningCenter, renderHabitTracker, renderJournal } from './pages
 import { renderReports } from './pages/reports.js';
 import { renderSettings } from './pages/settings.js';
 import { renderCountry } from './pages/country.js';
+import { renderResearch } from './pages/research.js';
 
 // ---- REGISTER ALL ROUTES ----
 function registerRoutes() {
@@ -73,6 +74,7 @@ function registerRoutes() {
   router.register('reports', () => renderReports(c));
   router.register('settings', () => renderSettings(c));
   router.register('country', () => renderCountry(c));
+  router.register('research', () => renderResearch(c));
 
   // Fallback for unmatched hash
   router.register('404', () => {
