@@ -4,40 +4,99 @@
 import { formatCurrency, formatNumber, formatPct, colorClass, toast, generateSparkline } from '../utils.js';
 import { economicAPI, fearGreedAPI } from '../api.js';
 
+// ---- ALL ECONOMIC EVENTS (with cc = country code) ----
+const ALL_ECON_EVENTS = [
+  // ---- INDIA ----
+  { date:'2026-08-01', time:'10:00', event:'India Manufacturing PMI (Jul)',    country:'🇮🇳', cc:'IN', impact:'high',   forecast:'58.5', actual:null, previous:'57.5' },
+  { date:'2026-08-05', time:'10:00', event:'India Services PMI (Jul)',          country:'🇮🇳', cc:'IN', impact:'high',   forecast:'61.2', actual:null, previous:'60.5' },
+  { date:'2026-08-06', time:'11:30', event:'India FII Net Investment (Jul)',    country:'🇮🇳', cc:'IN', impact:'medium', forecast:'₹8,200 Cr', actual:null, previous:'₹6,840 Cr' },
+  { date:'2026-08-07', time:'10:00', event:'India RBI MPC Rate Decision',       country:'🇮🇳', cc:'IN', impact:'high',   forecast:'6.25%', actual:null, previous:'6.50%' },
+  { date:'2026-08-07', time:'12:00', event:'India RBI Governor Press Conf.',    country:'🇮🇳', cc:'IN', impact:'high',   forecast:null, actual:null, previous:null },
+  { date:'2026-08-11', time:'09:00', event:'India Trade Balance (Jun)',         country:'🇮🇳', cc:'IN', impact:'medium', forecast:'-$21.5B', actual:null, previous:'-$23.8B' },
+  { date:'2026-08-12', time:'17:30', event:'India CPI Inflation (YoY)',         country:'🇮🇳', cc:'IN', impact:'high',   forecast:'4.6%', actual:null, previous:'4.9%' },
+  { date:'2026-08-13', time:'17:30', event:'India WPI Inflation (YoY)',         country:'🇮🇳', cc:'IN', impact:'medium', forecast:'2.1%', actual:null, previous:'2.6%' },
+  { date:'2026-08-15', time:'09:00', event:'India Independence Day — NSE/BSE Holiday', country:'🇮🇳', cc:'IN', impact:'low', forecast:null, actual:null, previous:null },
+  { date:'2026-08-18', time:'17:30', event:'India Industrial Production IIP (Jun)', country:'🇮🇳', cc:'IN', impact:'medium', forecast:'6.2%', actual:null, previous:'5.9%' },
+  { date:'2026-08-20', time:'09:00', event:'India GST Collections (Jul)',       country:'🇮🇳', cc:'IN', impact:'medium', forecast:'₹1.88L Cr', actual:null, previous:'₹1.74L Cr' },
+  { date:'2026-08-25', time:'10:00', event:'India Q1 FY27 GDP Advance Est.',   country:'🇮🇳', cc:'IN', impact:'high',   forecast:'7.2%', actual:null, previous:'7.0%' },
+  { date:'2026-08-28', time:'17:30', event:'India Bank Credit Growth (Aug)',    country:'🇮🇳', cc:'IN', impact:'medium', forecast:'13.8%', actual:null, previous:'13.4%' },
+  { date:'2026-08-29', time:'10:00', event:'India Infrastructure Output (Jul)', country:'🇮🇳', cc:'IN', impact:'medium', forecast:'8.1%', actual:null, previous:'7.4%' },
+  { date:'2026-08-31', time:'17:30', event:'India Fiscal Deficit (Apr–Jul)',    country:'🇮🇳', cc:'IN', impact:'medium', forecast:'38% of target', actual:null, previous:'42% of target' },
+  // ---- US ----
+  { date:'2026-08-01', time:'08:30', event:'US Nonfarm Payrolls',              country:'🇺🇸', cc:'US', impact:'high',   forecast:'185K', actual:null, previous:'177K' },
+  { date:'2026-08-01', time:'08:30', event:'US Unemployment Rate',             country:'🇺🇸', cc:'US', impact:'high',   forecast:'3.9%', actual:null, previous:'4.0%' },
+  { date:'2026-08-02', time:'10:00', event:'US ISM Services PMI',              country:'🇺🇸', cc:'US', impact:'medium', forecast:'51.2', actual:null, previous:'50.9' },
+  { date:'2026-08-07', time:'08:30', event:'US Initial Jobless Claims',        country:'🇺🇸', cc:'US', impact:'medium', forecast:'218K', actual:null, previous:'222K' },
+  { date:'2026-08-12', time:'08:30', event:'US CPI (YoY)',                     country:'🇺🇸', cc:'US', impact:'high',   forecast:'3.1%', actual:null, previous:'3.0%' },
+  { date:'2026-08-12', time:'08:30', event:'US Core CPI (YoY)',                country:'🇺🇸', cc:'US', impact:'high',   forecast:'3.3%', actual:null, previous:'3.4%' },
+  { date:'2026-08-15', time:'08:30', event:'US Retail Sales (MoM)',            country:'🇺🇸', cc:'US', impact:'high',   forecast:'0.3%', actual:null, previous:'-0.1%' },
+  { date:'2026-08-20', time:'18:00', event:'FOMC Minutes',                     country:'🇺🇸', cc:'US', impact:'high',   forecast:null, actual:null, previous:null },
+  { date:'2026-08-22', time:'08:30', event:'US GDP (QoQ)',                     country:'🇺🇸', cc:'US', impact:'high',   forecast:'1.8%', actual:null, previous:'1.4%' },
+  { date:'2026-08-26', time:'10:00', event:'Jackson Hole Symposium',           country:'🇺🇸', cc:'GLOBAL', impact:'high', forecast:null, actual:null, previous:null },
+  // ---- UK ----
+  { date:'2026-08-01', time:'09:30', event:'UK Manufacturing PMI',             country:'🇬🇧', cc:'GB', impact:'medium', forecast:'51.0', actual:null, previous:'50.2' },
+  { date:'2026-08-06', time:'07:00', event:'UK Bank Rate Decision (BoE)',      country:'🇬🇧', cc:'GB', impact:'high',   forecast:'5.0%', actual:null, previous:'5.25%' },
+  { date:'2026-08-14', time:'07:00', event:'UK CPI (YoY)',                     country:'🇬🇧', cc:'GB', impact:'high',   forecast:'2.1%', actual:null, previous:'2.3%' },
+  { date:'2026-08-22', time:'07:00', event:'UK Retail Sales (MoM)',            country:'🇬🇧', cc:'GB', impact:'medium', forecast:'0.4%', actual:null, previous:'-0.2%' },
+  // ---- JAPAN ----
+  { date:'2026-08-01', time:'01:30', event:'Japan Manufacturing PMI',          country:'🇯🇵', cc:'JP', impact:'medium', forecast:'50.8', actual:null, previous:'50.0' },
+  { date:'2026-08-09', time:'00:50', event:'Japan GDP (QoQ)',                  country:'🇯🇵', cc:'JP', impact:'high',   forecast:'0.4%', actual:null, previous:'0.2%' },
+  { date:'2026-08-22', time:'01:30', event:'Japan CPI (YoY)',                  country:'🇯🇵', cc:'JP', impact:'high',   forecast:'2.8%', actual:null, previous:'2.7%' },
+  { date:'2026-08-25', time:'00:00', event:'Bank of Japan Policy Minutes',     country:'🇯🇵', cc:'JP', impact:'high',   forecast:null, actual:null, previous:null },
+  // ---- GERMANY ----
+  { date:'2026-08-04', time:'08:00', event:'Germany Manufacturing PMI',        country:'🇩🇪', cc:'DE', impact:'medium', forecast:'44.1', actual:null, previous:'43.5' },
+  { date:'2026-08-14', time:'07:00', event:'Germany CPI (YoY)',                country:'🇩🇪', cc:'DE', impact:'high',   forecast:'2.4%', actual:null, previous:'2.6%' },
+  { date:'2026-08-25', time:'06:00', event:'Germany GDP (QoQ)',                country:'🇩🇪', cc:'DE', impact:'high',   forecast:'0.2%', actual:null, previous:'-0.1%' },
+  // ---- CHINA ----
+  { date:'2026-08-01', time:'01:45', event:'China Caixin Manufacturing PMI',   country:'🇨🇳', cc:'CN', impact:'high',   forecast:'51.8', actual:null, previous:'51.2' },
+  { date:'2026-08-05', time:'01:45', event:'China Caixin Services PMI',        country:'🇨🇳', cc:'CN', impact:'medium', forecast:'52.1', actual:null, previous:'51.8' },
+  { date:'2026-08-09', time:'01:30', event:'China CPI (YoY)',                  country:'🇨🇳', cc:'CN', impact:'medium', forecast:'0.4%', actual:null, previous:'0.2%' },
+  { date:'2026-08-15', time:'02:00', event:'China Industrial Production (YoY)',country:'🇨🇳', cc:'CN', impact:'high',   forecast:'5.8%', actual:null, previous:'5.6%' },
+  // ---- AUSTRALIA ----
+  { date:'2026-08-05', time:'04:30', event:'Australia RBA Rate Decision',      country:'🇦🇺', cc:'AU', impact:'high',   forecast:'4.10%', actual:null, previous:'4.35%' },
+  { date:'2026-08-14', time:'01:30', event:'Australia Unemployment Rate',      country:'🇦🇺', cc:'AU', impact:'medium', forecast:'4.0%', actual:null, previous:'3.9%' },
+  // ---- CANADA ----
+  { date:'2026-08-20', time:'08:30', event:'Canada CPI (YoY)',                 country:'🇨🇦', cc:'CA', impact:'high',   forecast:'2.5%', actual:null, previous:'2.8%' },
+  { date:'2026-08-27', time:'08:30', event:'Canada GDP (MoM)',                 country:'🇨🇦', cc:'CA', impact:'medium', forecast:'0.2%', actual:null, previous:'0.1%' },
+  // ---- SOUTH KOREA ----
+  { date:'2026-08-01', time:'23:00', event:'South Korea Exports (YoY)',        country:'🇰🇷', cc:'KR', impact:'high',   forecast:'12.4%', actual:null, previous:'9.1%' },
+  { date:'2026-08-22', time:'23:00', event:'South Korea GDP (QoQ)',            country:'🇰🇷', cc:'KR', impact:'high',   forecast:'0.6%', actual:null, previous:'0.3%' },
+  // ---- SINGAPORE ----
+  { date:'2026-08-14', time:'01:00', event:'Singapore GDP (QoQ)',              country:'🇸🇬', cc:'SG', impact:'high',   forecast:'0.8%', actual:null, previous:'0.5%' },
+  // ---- UAE / SAUDI ----
+  { date:'2026-08-10', time:'10:00', event:'Saudi Arabia CPI (YoY)',           country:'🇸🇦', cc:'SA', impact:'medium', forecast:'1.8%', actual:null, previous:'1.6%' },
+  { date:'2026-08-12', time:'10:00', event:'UAE CPI (YoY)',                    country:'🇦🇪', cc:'AE', impact:'medium', forecast:'2.4%', actual:null, previous:'2.2%' },
+  // ---- EUROZONE ----
+  { date:'2026-08-01', time:'04:00', event:'Eurozone GDP (QoQ)',               country:'🇪🇺', cc:'EU', impact:'high',   forecast:'0.3%', actual:null, previous:'0.3%' },
+  { date:'2026-08-13', time:'05:00', event:'Eurozone Industrial Production',   country:'🇪🇺', cc:'EU', impact:'medium', forecast:'-0.2%', actual:null, previous:'-0.4%' },
+];
+
+// Which events to show per country (own country + globally important)
+function getEventsForCountry(cc) {
+  if (!cc || cc === 'US') return ALL_ECON_EVENTS.filter(e => e.cc === 'US' || e.cc === 'GLOBAL');
+  // For any other country: show own events + GLOBAL + key US events (high impact)
+  return ALL_ECON_EVENTS.filter(e =>
+    e.cc === cc ||
+    e.cc === 'GLOBAL' ||
+    (e.cc === 'US' && e.impact === 'high')
+  );
+}
+
 // ---- ECONOMIC CALENDAR ----
 export function renderEconomicCalendar(container) {
-  const events = [
-    { date: '2026-08-01', time: '08:30', event: 'US Nonfarm Payrolls', country: '🇺🇸', impact: 'high', forecast: '185K', actual: null, previous: '177K' },
-    { date: '2026-08-01', time: '08:30', event: 'US Unemployment Rate', country: '🇺🇸', impact: 'high', forecast: '3.9%', actual: null, previous: '4.0%' },
-    { date: '2026-08-02', time: '10:00', event: 'US ISM Services PMI', country: '🇺🇸', impact: 'medium', forecast: '51.2', actual: null, previous: '50.9' },
-    { date: '2026-08-05', time: '09:45', event: 'US S&P Global Services PMI', country: '🇺🇸', impact: 'low', forecast: '55.1', actual: null, previous: '55.3' },
-    { date: '2026-08-07', time: '08:30', event: 'US Initial Jobless Claims', country: '🇺🇸', impact: 'medium', forecast: '218K', actual: null, previous: '222K' },
-    { date: '2026-08-12', time: '08:30', event: 'US CPI (YoY)', country: '🇺🇸', impact: 'high', forecast: '3.1%', actual: null, previous: '3.0%' },
-    { date: '2026-08-12', time: '08:30', event: 'US Core CPI (YoY)', country: '🇺🇸', impact: 'high', forecast: '3.3%', actual: null, previous: '3.4%' },
-    { date: '2026-08-13', time: '08:30', event: 'US PPI (MoM)', country: '🇺🇸', impact: 'medium', forecast: '0.2%', actual: null, previous: '0.1%' },
-    { date: '2026-08-15', time: '08:30', event: 'US Retail Sales (MoM)', country: '🇺🇸', impact: 'high', forecast: '0.3%', actual: null, previous: '-0.1%' },
-    { date: '2026-08-20', time: '18:00', event: 'FOMC Minutes', country: '🇺🇸', impact: 'high', forecast: null, actual: null, previous: null },
-    { date: '2026-08-22', time: '08:30', event: 'US GDP (QoQ)', country: '🇺🇸', impact: 'high', forecast: '1.8%', actual: null, previous: '1.4%' },
-    { date: '2026-08-26', time: '10:00 AM', event: 'Jackson Hole Symposium', country: '🇺🇸', impact: 'high', forecast: null, actual: null, previous: null },
-    { date: '2026-08-01', time: '09:30', event: 'UK Manufacturing PMI', country: '🇬🇧', impact: 'medium', forecast: '51.0', actual: null, previous: '50.2' },
-    { date: '2026-08-06', time: '07:00', event: 'UK Bank Rate Decision', country: '🇬🇧', impact: 'high', forecast: '5.0%', actual: null, previous: '5.25%' },
-    { date: '2026-08-05', time: '03:00', event: 'China Caixin Services PMI', country: '🇨🇳', impact: 'medium', forecast: '52.1', actual: null, previous: '51.2' },
-    { date: '2026-08-09', time: '20:30', event: 'China CPI (YoY)', country: '🇨🇳', impact: 'medium', forecast: '0.4%', actual: null, previous: '0.2%' },
-    { date: '2026-08-07', time: '11:30', event: 'India RBI Rate Decision', country: '🇮🇳', impact: 'high', forecast: '6.50%', actual: null, previous: '6.50%' },
-    { date: '2026-08-14', time: '12:00', event: 'India CPI (YoY)', country: '🇮🇳', impact: 'medium', forecast: '4.8%', actual: null, previous: '4.9%' },
-    { date: '2026-08-01', time: '04:00', event: 'Eurozone GDP (QoQ)', country: '🇪🇺', impact: 'high', forecast: '0.3%', actual: null, previous: '0.3%' },
-    { date: '2026-08-13', time: '05:00', event: 'Eurozone Industrial Production', country: '🇪🇺', impact: 'medium', forecast: '-0.2%', actual: null, previous: '-0.4%' },
-  ];
-
+  const selectedCC = localStorage.getItem('wos_country') || 'US';
+  const CC_FLAGS = { US:'🇺🇸', IN:'🇮🇳', GB:'🇬🇧', JP:'🇯🇵', DE:'🇩🇪', CN:'🇨🇳', AU:'🇦🇺', CA:'🇨🇦', KR:'🇰🇷', AE:'🇦🇪', SA:'🇸🇦', SG:'🇸🇬' };
+  const CC_NAMES = { US:'United States', IN:'India', GB:'UK', JP:'Japan', DE:'Germany', CN:'China', AU:'Australia', CA:'Canada', KR:'South Korea', AE:'UAE', SA:'Saudi Arabia', SG:'Singapore' };
+  const events = getEventsForCountry(selectedCC);
   const today = new Date().toISOString().split('T')[0];
-  let activeFilter = 'all';
 
   function renderTable(filter) {
     const filtered = events.filter(e => filter === 'all' || e.impact === filter);
     const byDate = {};
     filtered.forEach(e => { if (!byDate[e.date]) byDate[e.date] = []; byDate[e.date].push(e); });
+    if (Object.keys(byDate).length === 0) return `<div class="empty-state"><i class="fa fa-calendar"></i><p>No events found for this filter.</p></div>`;
     return Object.entries(byDate).sort(([a],[b])=>a.localeCompare(b)).map(([date, evts]) => {
-      const d = new Date(date);
+      const d = new Date(date + 'T00:00:00');
       const isToday = date === today;
       const label = isToday ? '📅 Today' : d.toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric' });
       return `
@@ -47,10 +106,11 @@ export function renderEconomicCalendar(container) {
             <span class="badge badge-info">${evts.length} events</span>
           </div>
           ${evts.map(e => {
-            const impactClass = { high: 'danger', medium: 'warning', low: 'success' }[e.impact] || 'info';
-            const impactBulls = { high: '🔴🔴🔴', medium: '🟡🟡', low: '🟢' }[e.impact];
+            const impactClass = { high:'danger', medium:'warning', low:'success' }[e.impact] || 'info';
+            const impactBulls = { high:'🔴🔴🔴', medium:'🟡🟡', low:'🟢' }[e.impact];
+            const isOwn = e.cc === selectedCC;
             return `
-              <div class="economic-event ${isToday?'is-today':''}">
+              <div class="economic-event ${isToday?'is-today':''}" style="${isOwn?'border-left:3px solid var(--brand-primary);':''}">
                 <div class="economic-event-time"><span class="text-xs text-muted">${e.time}</span></div>
                 <div class="economic-event-country">${e.country}</div>
                 <div class="economic-event-name">
@@ -70,20 +130,23 @@ export function renderEconomicCalendar(container) {
     }).join('');
   }
 
+  const countryName = CC_NAMES[selectedCC] || 'Global';
+  const countryFlag = CC_FLAGS[selectedCC] || '🌍';
+
   container.innerHTML = `
     <div class="page-header">
-      <div><h1 class="page-title"><i class="fa fa-calendar-days text-blue"></i> Economic Calendar</h1>
-      <p class="page-subtitle">Track global economic events and their market impact</p></div>
+      <div>
+        <h1 class="page-title"><i class="fa fa-calendar-days text-blue"></i> Economic Calendar</h1>
+        <p class="page-subtitle">${countryFlag} Showing <strong>${countryName}</strong> events + key global events</p>
+      </div>
     </div>
 
-    <!-- Impact Stats -->
     <div class="grid grid-3 mb-4">
       <div class="stat-card"><div class="stat-icon red"><i class="fa fa-exclamation-triangle"></i></div><div class="stat-label">High Impact</div><div class="stat-value">${events.filter(e=>e.impact==='high').length}</div><div class="stat-change negative">Market movers</div></div>
       <div class="stat-card"><div class="stat-icon orange"><i class="fa fa-chart-bar"></i></div><div class="stat-label">Medium Impact</div><div class="stat-value">${events.filter(e=>e.impact==='medium').length}</div><div class="stat-change neutral">Worth watching</div></div>
       <div class="stat-card"><div class="stat-icon green"><i class="fa fa-calendar-check"></i></div><div class="stat-label">Total Events</div><div class="stat-value">${events.length}</div><div class="stat-change positive">This month</div></div>
     </div>
 
-    <!-- Filters -->
     <div class="card mb-4">
       <div class="card-body" style="padding:12px">
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
@@ -94,12 +157,9 @@ export function renderEconomicCalendar(container) {
       </div>
     </div>
 
-    <div id="calendar-events">
-      ${renderTable('all')}
-    </div>
+    <div id="calendar-events">${renderTable('all')}</div>
   `;
 
-  // Add CSS for economic calendar layout
   if (!document.getElementById('eco-cal-styles')) {
     const style = document.createElement('style');
     style.id = 'eco-cal-styles';
@@ -134,6 +194,10 @@ export function renderEconomicCalendar(container) {
       el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
     });
   });
+
+  const _calHandler = () => renderEconomicCalendar(container);
+  document.addEventListener('countrySelected', _calHandler);
+  return () => document.removeEventListener('countrySelected', _calHandler);
 }
 
 // ---- IPO TRACKER ----
