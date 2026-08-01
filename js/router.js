@@ -65,20 +65,35 @@ class Router {
       setTimeout(() => this.container.classList.remove('animate-fade'), 400);
     }
 
-    // Render the page
-    const cleanup = renderer(this.container);
-    if (typeof cleanup === 'function') {
-      this._cleanups.push(cleanup);
-    }
-
-    // Scroll to top
-    if (this.container) this.container.scrollTop = 0;
-
-    // Close sidebar on mobile
+    // Close sidebar on mobile BEFORE rendering (prevents tap-through issues)
     if (window.innerWidth < 900) {
       document.getElementById('sidebar')?.classList.remove('mobile-open');
       document.getElementById('sidebar-overlay')?.remove();
     }
+
+    // Render the page — wrapped in try/catch so errors show instead of silently showing Dashboard
+    try {
+      const cleanup = renderer(this.container);
+      if (typeof cleanup === 'function') {
+        this._cleanups.push(cleanup);
+      }
+    } catch (err) {
+      console.error(`[Router] Error rendering page "${page}":`, err);
+      if (this.container) {
+        this.container.innerHTML = `
+          <div style="padding:60px 24px;text-align:center">
+            <i class="fa fa-triangle-exclamation" style="font-size:3rem;color:#f59e0b;display:block;margin-bottom:16px"></i>
+            <h2 style="color:#f8fafc;margin-bottom:8px">Could not load "${page}"</h2>
+            <p style="color:#94a3b8;margin-bottom:20px">Error: ${err.message}</p>
+            <a href="#dashboard" style="padding:10px 24px;background:#6366f1;color:#fff;border-radius:8px;text-decoration:none;font-weight:600">
+              <i class="fa fa-house"></i> Go to Dashboard
+            </a>
+          </div>`;
+      }
+    }
+
+    // Scroll to top
+    if (this.container) this.container.scrollTop = 0;
   }
 
   registerCleanup(fn) {
