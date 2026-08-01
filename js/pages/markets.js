@@ -606,18 +606,37 @@ export function renderMutualFunds(container) {
   `;
 }
 
+// ---- Currency helper ----
+const COUNTRY_CURR = { IN:'₹', GB:'£', JP:'¥', DE:'€', CN:'¥', KR:'₩', AU:'A$', CA:'C$', AE:'AED ', SA:'SAR ', SG:'S$' };
+function fmtPrice(price, country) {
+  const c = COUNTRY_CURR[country];
+  return c ? `${c}${(+price).toLocaleString()}` : formatCurrency(price);
+}
+
 // ---- TOP GAINERS/LOSERS ----
 export function renderTopGainers(container) {
-  const stocks = demoData.stocks.sort((a,b) => b.changePct - a.changePct);
-  renderGainersLosers(container, stocks.slice(0,10), 'Top Gainers', 'arrow-trend-up', true);
+  const country = localStorage.getItem('wos_country') || 'US';
+  const allStocks = COUNTRY_STOCKS[country] || demoData.stocks;
+  const stocks = [...allStocks].sort((a,b) => b.changePct - a.changePct);
+  const label = COUNTRY_INFO[country] || '🌍 Global';
+  renderGainersLosers(container, stocks.slice(0,10), `Top Gainers — ${label}`, 'arrow-trend-up', true, country);
+  const handler = () => renderTopGainers(container);
+  document.addEventListener('countrySelected', handler);
+  return () => document.removeEventListener('countrySelected', handler);
 }
 
 export function renderTopLosers(container) {
-  const stocks = demoData.stocks.sort((a,b) => a.changePct - b.changePct);
-  renderGainersLosers(container, stocks.slice(0,10), 'Top Losers', 'arrow-trend-down', false);
+  const country = localStorage.getItem('wos_country') || 'US';
+  const allStocks = COUNTRY_STOCKS[country] || demoData.stocks;
+  const stocks = [...allStocks].sort((a,b) => a.changePct - b.changePct);
+  const label = COUNTRY_INFO[country] || '🌍 Global';
+  renderGainersLosers(container, stocks.slice(0,10), `Top Losers — ${label}`, 'arrow-trend-down', false, country);
+  const handler = () => renderTopLosers(container);
+  document.addEventListener('countrySelected', handler);
+  return () => document.removeEventListener('countrySelected', handler);
 }
 
-function renderGainersLosers(container, stocks, title, icon, isGainer) {
+function renderGainersLosers(container, stocks, title, icon, isGainer, country) {
   container.innerHTML = `
     <div class="page-header">
       <div><h1 class="page-title"><i class="fa fa-${icon} ${isGainer ? 'text-success' : 'text-danger'}"></i> ${title}</h1><p class="page-subtitle">Today's biggest movers</p></div>
@@ -626,7 +645,7 @@ function renderGainersLosers(container, stocks, title, icon, isGainer) {
       ${stocks.slice(0,3).map(s => `
         <div class="stat-card" style="border-top-color:${isGainer?'var(--brand-accent)':'var(--brand-danger)'}">
           <div class="stat-label">${s.symbol} — ${s.name}</div>
-          <div class="stat-value mono">${formatCurrency(s.price)}</div>
+          <div class="stat-value mono">${fmtPrice(s.price, country)}</div>
           <div class="stat-change ${isGainer?'positive':'negative'}"><i class="fa fa-arrow-${isGainer?'up':'down'}"></i> ${formatPct(s.changePct)}</div>
           <div style="margin-top:8px">${svgSparkline(generateSparkline(14,s.price,0.02))}</div>
         </div>
@@ -641,7 +660,7 @@ function renderGainersLosers(container, stocks, title, icon, isGainer) {
               <td class="text-muted font-bold">#${i+1}</td>
               <td class="font-bold ${isGainer?'text-success':'text-danger'}">${s.symbol}</td>
               <td class="text-sm">${s.name}</td>
-              <td class="mono font-bold">${formatCurrency(s.price)}</td>
+              <td class="mono font-bold">${fmtPrice(s.price, country)}</td>
               <td class="${colorClass(s.change)} mono">${s.change>=0?'+':''}${s.change.toFixed(2)}</td>
               <td><span class="data-pill ${pillClass(s.changePct)}">${formatPct(s.changePct)}</span></td>
               <td class="text-muted text-sm">${s.volume}</td>
@@ -657,10 +676,12 @@ function renderGainersLosers(container, stocks, title, icon, isGainer) {
 
 // ---- HEATMAP ----
 export function renderHeatmap(container) {
-  const stocks = demoData.stocks;
+  const country = localStorage.getItem('wos_country') || 'US';
+  const stocks = COUNTRY_STOCKS[country] || demoData.stocks;
+  const label = COUNTRY_INFO[country] || '🌍 Global';
   container.innerHTML = `
     <div class="page-header">
-      <div><h1 class="page-title">Market Heatmap</h1><p class="page-subtitle">Visual representation of market performance by change %</p></div>
+      <div><h1 class="page-title">Market Heatmap — ${label}</h1><p class="page-subtitle">Visual representation of market performance by change %</p></div>
       <div class="page-actions">
         <select id="heatmap-by" class="form-select">
           <option value="day">1 Day</option>
@@ -688,7 +709,7 @@ export function renderHeatmap(container) {
             return `<div class="heatmap-cell ${cls}" title="${s.name}: ${formatPct(pct)}">
               <div style="font-weight:800;font-size:0.85rem">${s.symbol}</div>
               <div style="font-size:0.75rem">${formatPct(pct)}</div>
-              <div style="font-size:0.7rem;opacity:0.7">${formatCurrency(s.price)}</div>
+              <div style="font-size:0.7rem;opacity:0.7">${fmtPrice(s.price, country)}</div>
             </div>`;
           }).join('')}
         </div>
@@ -748,6 +769,9 @@ export function renderHeatmap(container) {
       </div>
     </div>
   `;
+  const _heatHandler = () => renderHeatmap(container);
+  document.addEventListener('countrySelected', _heatHandler);
+  return () => document.removeEventListener('countrySelected', _heatHandler);
 }
 
 // ---- SECTOR PERFORMANCE ----
